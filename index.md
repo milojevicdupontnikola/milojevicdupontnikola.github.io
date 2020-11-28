@@ -1,6 +1,6 @@
 ---
 title: /Nikola Milojevic-Dupont
-layout: home
+layout: page
 permalink: /Nikola Milojevic-Dupont
 ---
 
