@@ -8,4 +8,5 @@ permalink: /
 
 Hi, I am Nikola Milojevic-Dupont.
 
-[!][image][pic_bnw.jpg]
+<img src="https://github.com/milojevicdupontnikola/milojevicdupontnikola.github.io/blob/master/pic_bnw.jpg" alt="image" width="200"/>
+
