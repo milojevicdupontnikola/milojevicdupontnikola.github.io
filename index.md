@@ -4,6 +4,8 @@ layout: home
 permalink: /
 ---
 
+<img src="pic_bnw.jpg" alt="image" width="500"/>
+
 # About
 
 Hi, I am Nikola Milojevic-Dupont. 
