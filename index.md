@@ -1,7 +1,7 @@
 ---
 title: /Milojevic-Dupont Nikola
 layout: home
-permalink: /
+permalink: /Milojevic-Dupont Nikola
 ---
 
 # About
