@@ -4,7 +4,7 @@ layout: home
 permalink: /
 ---
 
-<img src="pic_bnw.jpg" alt="image" width="500"/>
+<img src="pic_bnw.jpg" alt="image" width="700"/>
 
 # About
 
