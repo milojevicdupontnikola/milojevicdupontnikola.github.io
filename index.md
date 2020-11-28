@@ -1,6 +1,6 @@
 ---
 title: Nikola Milojevic-Dupont
-layout: page
+layout: home
 permalink: Nikola Milojevic-Dupont
 ---
 
