@@ -1,0 +1,17 @@
+title: 'milojevic-dupont.github.io'
+description: "bla"
+url: "https://milojevic-dupont.github.io"
+
+header_pages:
+  - index.md
+  - about.md
+  - links.md
+  - contact.md
+
+style: dark
+
+footer: 'last updated: xxx'
+
+# Build settings
+markdown: kramdown
+remote_theme: b2a3e8/jekyll-theme-console
