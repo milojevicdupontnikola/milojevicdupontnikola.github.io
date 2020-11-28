@@ -1,5 +1,5 @@
 ---
-title: /Milojevic-Dupont Nikola
+title: Milojevic-Dupont Nikola
 layout: home
 permalink: /
 ---
