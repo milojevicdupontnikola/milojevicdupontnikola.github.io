@@ -7,3 +7,5 @@ permalink: /
 # About
 
 Hi, I am Nikola Milojevic-Dupont.
+
+[!][image][pic_bnw.jpg]
