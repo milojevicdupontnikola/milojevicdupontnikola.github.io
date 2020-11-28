@@ -11,7 +11,7 @@ header_pages:
 
 style: dark
 
-footer: 'last updated: 11.28.2020'
+footer: 'last updated: 11.28.2020 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
 
 # Build settings
 markdown: kramdown
