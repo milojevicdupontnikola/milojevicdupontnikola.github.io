@@ -1,10 +1,10 @@
 title: 'milojevic-dupont.github.io'
 description: "bla"
-url: "https://milojevic-dupont.github.io"
+url: "https://milojevicdupontnikola.github.io"
 
 header_pages:
   - index.md
-  - about.md
+  - cv.md
   - links.md
   - contact.md
 

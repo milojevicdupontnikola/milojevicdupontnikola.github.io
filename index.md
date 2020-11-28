@@ -1,9 +1,9 @@
 ---
-title: /
+title: Nikola Milojevic-Dupont
 layout: home
-permalink: /
+permalink: Nikola Milojevic-Dupont
 ---
 
-# Welcome
+# About
 
-Bla bla bla bla. Bla bla bla bla bla bla bla bla.
+Hi, I am Nikola Milojevic-Dupont.
