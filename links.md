@@ -1,7 +1,7 @@
 ---
 layout: page
 title: /links
-permalink: /links/
+permalink: /links
 ---
 
 # Links
