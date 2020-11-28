@@ -1,7 +1,7 @@
 ---
-title: /
+title: Nikola Milojevic-Dupont
 layout: home
-permalink: /
+permalink: index
 ---
 
 # About

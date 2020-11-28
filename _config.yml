@@ -1,6 +1,8 @@
 title: 'milojevic-dupont.github.io'
 description: "bla"
+baseurl: "/index"
 url: "https://milojevicdupontnikola.github.io"
+
 
 header_pages:
   - index.md
@@ -10,7 +12,7 @@ header_pages:
 
 style: dark
 
-footer: 'last updated: 11.28.2020'
+footer: 'last updated: xxx'
 
 # Build settings
 markdown: kramdown
