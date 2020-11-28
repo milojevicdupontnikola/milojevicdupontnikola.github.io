@@ -10,7 +10,7 @@ header_pages:
 
 style: dark
 
-footer: 'last updated: xxx'
+footer: 'last updated: 11.28.2020'
 
 # Build settings
 markdown: kramdown
