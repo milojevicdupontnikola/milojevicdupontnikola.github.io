@@ -6,7 +6,7 @@ url: "https://milojevicdupontnikola.github.io"
 header_pages:
   - index.md
   - cv.md
-  - links.md
+  - projects.md
   - contact.md
 
 style: dark
