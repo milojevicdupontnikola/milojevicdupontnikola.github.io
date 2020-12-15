@@ -12,7 +12,6 @@ Click on a publication for more details.
 
 2. [Machine learning for geographically differentiated climate change mitigation in urban areas](pub-ML4CCM). Milojevic-Dupont, N., & Creutzig, F. (2020).  Sustainable Cities and Society, 102526.
 
-3.  [Fair street space allocation:  ethical principles and empirical insights](pub-fair-streetspace). Creutzig, F., Javaid, A., Soomauroo, Z., Lohrey, S., Milojevic-Dupont, N., Ramakrishnan, A., ... (2020).  Transport Reviews, 1-23
+3.  [Fair street space allocation: ethical principles and empirical insights](pub-fair-streetspace). Creutzig, F., Javaid, A., Soomauroo, Z., Lohrey, S., Milojevic-Dupont, N., Ramakrishnan, A., ... (2020).  Transport Reviews, 1-23
 
-4.  [Tackling climate change with machine learning](pub-CCAI).  Rolnick, D., Donti, P. L., Kaack, L. H., Kochanski, K., Lacoste, A., Sankaran, K., Ross AS, Milojevic-Dupont, N.,  Jaques,  N.,  Waldman-Brown,  A.   Luccioni,  A.,  Maharaj,  T.,  Sherwin,  E.  D., Mukkavilli, S. K., Kording, K. P., Gomes, C., Ng, A. Y., Hassabis, D., Platt, J. C.,
-Creutzig, F., Chayes.  F. & Bengio, Y. (2019).  arXiv preprint arXiv:1906.05433.
+4.  [Tackling climate change with machine learning](pub-CCAI).  Rolnick, D., Donti, P. L., Kaack, L. H., Kochanski, K., Lacoste, A., Sankaran, K., Ross AS, Milojevic-Dupont, N.,  Jaques,  N.,  Waldman-Brown,  A.   Luccioni,  A.,  Maharaj,  T.,  Sherwin,  E.  D., Mukkavilli, S. K., Kording, K. P., Gomes, C., Ng, A. Y., Hassabis, D., Platt, J. C., Creutzig, F., Chayes.  F. & Bengio, Y. (2019).  arXiv preprint arXiv:1906.05433.
