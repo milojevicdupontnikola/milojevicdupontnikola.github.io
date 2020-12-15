@@ -5,8 +5,8 @@ url: "https://milojevicdupontnikola.github.io"
 
 header_pages:
   - index.md
-  - cv.pdf
   - projects.md
+  - publications.md
   - contact.md
 
 style: dark
