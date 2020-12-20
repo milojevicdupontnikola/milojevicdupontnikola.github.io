@@ -6,7 +6,7 @@ permalink: /pub-building-heights
 
 # Learning from urban form to predict building heights
 
-_Milojevic-Dupont,N., Hans, N., Kaack, L. H., Zumwald, M, Andrieux, F., de Barros Soares, D., Lohrey, S., Pichler, P.P. & Creutzig, F. (2020) PLoS ONE 15(12):e0242010_
+_Milojevic-Dupont,N., Hans, N., Kaack, L. H., Zumwald, M, Andrieux, F., de Barros Soares, D., Lohrey, S., Pichler, P.P. & Creutzig, F. (2020) PLoS ONE 15(12): e0242010_
 
 <img src="data-project-pic.png" alt="image" width="600"/>
 
