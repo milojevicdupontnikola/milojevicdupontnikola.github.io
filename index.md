@@ -17,7 +17,7 @@ My work focuses on sustainable urban planning, with a particular focus on applyi
 
 # Links
 
-<a href="https://milojevicdupontnikola.github.io/cv.pdf">CV</a> · Personal page (<a href="https://www.mcc-berlin.net/en/about/team/milojevic-dupont-nikola.html">MCC</a>, <a href="https://www.susturbecon.tu-berlin.de/team/nikola_milojevic_dupont/">TUB</a>) · <a href="https://scholar.google.com/citations?user=49xLPo8AAAAJ&hl=en&oi=ao">Google Scholar</a> · <a href="https://twitter.com/Nikola_MD">Twitter</a>
+<a href="https://milojevicdupontnikola.github.io/cv.pdf">CV</a> · Personal page (<a href="https://www.mcc-berlin.net/en/about/team/milojevic-dupont-nikola.html">MCC</a>, <a href="https://www.susturbecon.tu-berlin.de/team/nikola_milojevic_dupont/">TUB</a>) · <a href="https://scholar.google.com/citations?user=49xLPo8AAAAJ&hl=en&oi=ao">Google Scholar</a> · <a href="https://twitter.com/Nikola_MD">Twitter</a> · <a href="https://gitlab.pik-potsdam.de/nikolami/">Gitlab</a>
 
 
 

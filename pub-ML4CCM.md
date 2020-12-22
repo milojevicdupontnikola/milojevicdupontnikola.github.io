@@ -11,6 +11,7 @@ _Milojevic-Dupont, N., & Creutzig, F. (2020).  Sustainable Cities and Society, 1
 <img src="ml-project-pic.png" alt="image" width="600"/>
 
 [paper](https://www.sciencedirect.com/science/article/abs/pii/S2210670720307423)
+[accepted manuscript](docs/milojevic-dupont-and-creutzig2020.pdf)
 
 Artificial intelligence and machine learning are transforming scientific disciplines, but their full potential for climate change mitigation remains elusive. In this study, we conducted with Felix Creutzig a systematic review of applied machine learning studies that are of relevance for climate change mitigation, focusing specifically on the fields of remote sensing, urban transportation, and buildings. 
 
