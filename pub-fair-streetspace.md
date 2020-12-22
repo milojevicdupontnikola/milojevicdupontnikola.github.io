@@ -8,7 +8,7 @@ permalink: /pub-fair-streetspace
 
 _Creutzig, F., Javaid, A., Soomauroo, Z., Lohrey, S., Milojevic-Dupont, N., Ramakrishnan, A., ... (2020).  Transport Reviews, 1-23_
 
-<img src="streetspace-pic.png" alt="image" width="600"/>
+<img src="imgs/streetspace-pic.png" alt="image" width="600"/>
 
 [paper](https://www.tandfonline.com/doi/full/10.1080/01441647.2020.1762795)
 

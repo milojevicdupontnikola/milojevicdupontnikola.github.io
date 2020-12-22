@@ -8,7 +8,7 @@ permalink: /pub-building-heights
 
 _Milojevic-Dupont,N., Hans, N., Kaack, L. H., Zumwald, M, Andrieux, F., de Barros Soares, D., Lohrey, S., Pichler, P.P. & Creutzig, F. (2020) PLoS ONE 15(12): e0242010_
 
-<img src="data-project-pic.png" alt="image" width="600"/>
+<img src="imgs/data-project-pic.png" alt="image" width="600"/>
 
 [paper](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0242010) (open access)
 [code](https://gitlab.pik-potsdam.de/nikolami/learning-from-urban-form-to-predict-building-heights)

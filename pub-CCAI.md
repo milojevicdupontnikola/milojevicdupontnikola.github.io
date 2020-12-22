@@ -8,7 +8,7 @@ permalink: /pub-CCAI
 
 _Rolnick, D., Donti, P. L., Kaack, L. H., Kochanski, K., Lacoste, A., Sankaran, K., Ross AS, Milojevic-Dupont, N.,  Jaques,  N.,  Waldman-Brown,  A.   Luccioni,  A.,  Maharaj,  T.,  Sherwin,  E.  D., Mukkavilli, S. K., Kording, K. P., Gomes, C., Ng, A. Y., Hassabis, D., Platt, J. C., Creutzig, F., Chayes.  F. & Bengio, Y. (2019).  arXiv preprint arXiv:1906.05433._
 
-<img src="tackling-cc-ml-pic.png" alt="image" width="600"/>
+<img src="imgs/tackling-cc-ml-pic.png" alt="image" width="600"/>
 
 [paper](https://arxiv.org/abs/1906.05433) (open access)
 
