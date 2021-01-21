@@ -8,7 +8,7 @@ permalink: /pub-ML4CCM
 
 _Milojevic-Dupont, N., & Creutzig, F. (2020).  Sustainable Cities and Society, 102526._
 
-<img src="ml-project-pic.png" alt="image" width="600"/>
+<img src="imgs/ml-project-pic.png" alt="image" width="600"/>
 
 [paper](https://www.sciencedirect.com/science/article/abs/pii/S2210670720307423)
 [accepted manuscript](docs/milojevic-dupont-and-creutzig2020.pdf)
