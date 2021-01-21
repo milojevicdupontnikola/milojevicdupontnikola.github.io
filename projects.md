@@ -6,8 +6,6 @@ permalink: /projects
 
 # Projects
 
-_Page in construction_
-
 <img src="imgs/energy-project-pic.png" alt="image" width="600"/>
 
 ## Assessing how machine learning can help foster sustainable cities
