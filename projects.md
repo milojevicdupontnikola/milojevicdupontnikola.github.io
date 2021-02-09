@@ -14,7 +14,7 @@ There are high expectactions about the potential role of machine learning for su
 
 ## Spatial machine learning + urban form
 
-Increasingly rich data on urban morphology, land use, built infrastructure, offer opportunities of new quantitative analysis of cities, as well as predictive tools. With colleagues, we are developping approaches using machine learning to find energy-relevant features of urban form, to inform sustainable urban planning. We started with the simplest ML methods and are progressively aiming to develop tailored spatial machine learning approaches.   
+Increasingly rich data on urban morphology, land use, built infrastructure, offer opportunities of new quantitative analysis of cities, as well as predictive tools. With colleagues, we are developping approaches using machine learning to find energy-relevant features of urban form that can inform sustainable urban planning. We started with the simplest ML methods and are progressively aiming to develop tailored spatial machine learning approaches.   
 
 ## Gathering infrastructure data for sustainable urban planning
 
