@@ -10,7 +10,7 @@ permalink: /projects
 
 ## Assessing how machine learning can help foster sustainable cities
 
-There are high expectactions about the potential role of machine learning for sustainable cities, but the field is still nascent. I have written with colleagues several reviews on the state of the research on machine learning applications relevant to mitigating climate change in cities. A couple of others are in the making. I am also involved in education content creation at Climate Change AI, which includes for example a wiki. 
+There are high expectactions about the potential role of machine learning for sustainable cities, but the field is still nascent. With colleagues, I have written several reviews on the state of the research on machine learning applications relevant to mitigating climate change in cities. A couple of others are in the making. I am also involved in education content creation at Climate Change AI, which includes for example a wiki. 
 
 ## Spatial machine learning + urban form
 
@@ -23,7 +23,7 @@ Even though more and more data on cities become available, there are still large
 
 ## Large-scale models of energy use in buildings
 
-The buildings sector is a large contributor to global energy use and CO2 emissions and requires widespread renovation plans. The lack of relevant granular data has constrained modelling efforts to inform such efforts to small scales, or coarse approaches. I am working with colleagues on upscaling current city-scale models to larger regions.  
+The buildings sector is a large contributor to global energy use and CO2 emissions and requires widespread renovation plans. The lack of relevant granular data has constrained modelling efforts to inform such efforts to small scales, or coarse approaches. With colleagues, I am working on upscaling current city-scale models to larger regions.  
 
 
 
