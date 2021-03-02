@@ -11,6 +11,7 @@ _Creutzig, F., Javaid, A., Soomauroo, Z., Lohrey, S., Milojevic-Dupont, N., Rama
 <img src="imgs/streetspace-pic.png" alt="image" width="600"/>
 
 [paper](https://www.tandfonline.com/doi/full/10.1080/01441647.2020.1762795)
+[accepted manuscript](https://depositonce.tu-berlin.de/handle/11303/12648)
 
 Urban street space is increasingly contested. However, it is unclear what a fair street space allocation would look like. In this study that we conducted with students from TU Berlin as part of a seminar, we developped a framework of ten ethical principles and three normative perspectives on street space – streets for transport, streets for sustainability, and streets as place – and discussed 14 derived street space allocation mechanisms. We contrasted these ethically grounded allocation mechanisms with real-world allocation in 18 streets in Berlin. 
 
