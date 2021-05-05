@@ -16,4 +16,4 @@ footer: 'last updated: 05.05.2021 - <a href="https://github.com/b2a3e8/jekyll-th
 
 # Build settings
 markdown: kramdown
-remote_theme: b2a3e8/jekyll-theme-console
+theme: jekyll-theme-console
