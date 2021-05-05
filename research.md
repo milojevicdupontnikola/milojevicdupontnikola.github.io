@@ -1,10 +1,10 @@
 ---
 layout: page
-title: /projects
-permalink: /projects
+title: /research
+permalink: /research
 ---
 
-# Projects
+# Research
 
 <img src="imgs/boxes.png" alt="image" width="600"/>
 
