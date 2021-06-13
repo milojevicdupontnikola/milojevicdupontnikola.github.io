@@ -6,10 +6,11 @@ permalink: /projects
 
 # Projects
 
-<img src="imgs/eubucco.jpeg" width="600"/>
 
-## EUBUCCO: Modelling European Union’s Buildings Contribution to Climate Objectives
+## [EUBUCCO: Modelling European Union’s Buildings Contribution to Climate Objectives](proj-eubucco)
 
+## [Ongoing projects on machine learning for low-carbon planning at MCC/TUB](proj-ml-up)
 
+## [Ongoing projects at Climate Change AI](proj-ccai)
 
-## Other projects
+## [Understanding open government geospatial data on buildings](https://ual.sg/project/ogbd/)

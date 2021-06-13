@@ -8,7 +8,7 @@ permalink: /research
 
 <img src="imgs/boxes.png" alt="image" width="600"/>
 
-My research is mainly structured along 4 axes, detailed below. 
+My research follows 4 main axes: 
 
 ## Fostering the field of machine learning for urban sustainability
 
