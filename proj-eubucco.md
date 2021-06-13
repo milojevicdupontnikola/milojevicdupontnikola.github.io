@@ -23,7 +23,6 @@ In its first implementation, our model will estimate the energy demand for heati
 
 ## Scientific publications from the project
 
-Publications:
 - Learning from urban form to predict building heights, PLOS ONE, 2020
 
 ## Conference presentations about the project
@@ -31,7 +30,7 @@ Publications:
 - Data for Policy conference 2021 (upcoming)
 - International Energy Workshop 2021
 - OpenStreetMap State of the Map, 2020
-- Conference of the International Society for Industrial Ecology (ISIE) - Socio-Economic Metabolism Section, 2019
+- Conference of the International Society for Industrial Ecology, Socio-Economic Metabolism Section, 2019
 
 ## Current team:
 
