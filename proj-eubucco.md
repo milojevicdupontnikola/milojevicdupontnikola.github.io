@@ -32,9 +32,10 @@ In its first implementation, our model will estimate the energy demand for heati
 - OpenStreetMap State of the Map, 2020
 - Conference of the International Society for Industrial Ecology, Socio-Economic Metabolism Section, 2019
 
-## Current team:
+## Current team
 
-- Nikola Milojevic-Dupont (MCC Berlin, TU Berlin)
+- Nikola Milojevic-Dupont, project lead (MCC Berlin, TU Berlin)
+- Felix Creutzig, PI (MCC Berlin, TU Berlin)
 - Filip Biljecki (National University of Singapore)
 - Niko Heeren (NTNU)
 - Jiawei Hu (TU Berlin)
@@ -44,9 +45,9 @@ In its first implementation, our model will estimate the energy demand for heati
 - Felix Wagner (MCC Berlin, TU Berlin)
 - Aicha Zekar (NYU Abu Dhabi, TU Berlin)
 - Marius Zumwald (ETH Zurich)
-- Felix Creutzig (MCC Berlin, TU Berlin)
 
-## Past contributors:
+
+## Past contributors
 - Francois Andrieux (namR)
 - Marvin Bensch (MCC Berlin)
 - Nicolai Hans (MCC Berlin)
