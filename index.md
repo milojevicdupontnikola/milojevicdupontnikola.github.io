@@ -25,4 +25,11 @@ Email: milojevic@mcc-berlin.net
 Office: EUREF-Campus · Torgauer Str. 12–15 · building 19 · office 1.01 · 10829 Berlin, Germany
 
 
+Last updated: <span id="demo"><script> 
+var d = new Date(); 
+document.getElementById("demo").innerHTML = d.toDateString();
+</script></span>
+
+<a href="https://github.com/b2a3e8/jekyll-theme-console">Theme</a>'
+
 	
