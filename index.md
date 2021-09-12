@@ -25,7 +25,20 @@ Email: milojevic@mcc-berlin.net
 Office: EUREF-Campus · Torgauer Str. 12–15 · building 19 · office 1.01 · 10829 Berlin, Germany
 
 
-Last updated: "`r Sys.Date()`"
-
-
-	
+Last updated: 	
+<script type="text/javascript">
+	function setModifiedDate() {
+      if (document.getElementById('last-modified')) {
+        fetch("https://api.github.com/repos/{{ site.github.owner_name }}/{{ site.github.repository_name }}/commits?path={{ page.path }}")
+          .then((response) => {
+            return response.json();
+          })
+          .then((commits) => {
+            var modified = commits[0]['commit']['committer']['date'].slice(0,10);
+            if(modified != "{{ page.date | date: "%Y-%m-%d" }}") {
+              document.getElementById('last-modified').textContent = "Last Modified: " + modified;
+            }
+          });
+      }
+    }
+  </script>
