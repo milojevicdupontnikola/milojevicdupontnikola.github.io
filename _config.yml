@@ -12,7 +12,7 @@ header_pages:
 
 style: dark
 
-footer: <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>
+footer: <p>{{ site.time }}</p> - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>
 
 # Build settings
 markdown: kramdown
