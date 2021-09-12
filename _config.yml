@@ -12,8 +12,10 @@ header_pages:
 
 style: dark
 
-footer: 'last updated: 05.05.2021 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
+footer: 'last updated: <span id="demo"><script> var d = new Date(); document.getElementById("demo").innerHTML = d.toDateString();</script></span> - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
 
 # Build settings
 markdown: kramdown
 remote_theme: b2a3e8/jekyll-theme-console
+
+
