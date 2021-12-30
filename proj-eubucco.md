@@ -36,11 +36,13 @@ In its first implementation, our model will estimate the energy demand for heati
 
 - Nikola Milojevic-Dupont, project lead (MCC Berlin, TU Berlin)
 - Felix Creutzig, PI (MCC Berlin, TU Berlin)
+- Peter Berrill (TU Berlin)
 - Filip Biljecki (National University of Singapore)
 - Niko Heeren (NTNU)
 - Jiawei Hu (TU Berlin)
 - Lynn H. Kaack (ETH Zurich)
 - Steffen Lohrey (TU Berlin)
+- Florian Nachtigall (TU Berlin)
 - Peter-Paul Pichler (PIK)
 - Felix Wagner (MCC Berlin, TU Berlin)
 - Aicha Zekar (NYU Abu Dhabi, TU Berlin)
