@@ -12,7 +12,7 @@ header_pages:
 
 style: dark
 
-footer: 'Last updated: 11.14.21 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
+footer: 'Last updated: 04.08.22 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
 
 # Build settings
 markdown: kramdown
