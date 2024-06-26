@@ -5,14 +5,13 @@ url: "https://milojevicdupontnikola.github.io"
 
 header_pages:
   - index.md
-  - research.md
-  - projects.md
-  - publications.md
+#   - research.md
+#   - projects.md
+#   - publications.md
  
-
 style: dark
 
-footer: 'Last updated: 25.11.22 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
+footer: 'Last updated: 26.06.24 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
 
 # Build settings
 markdown: kramdown
