@@ -5,7 +5,7 @@ permalink: /
 ---
 
 <div style="width: 600px;">
-    <img src="imgs/pic_bnw.jpg" alt="headshot" width="50%" height="50%">
+    <img src="imgs/pic_bnw.jpg" alt="headshot" width="100%" height="100%">
 </div>
 
 
