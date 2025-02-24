@@ -8,9 +8,8 @@ permalink: /
     <img src="imgs/pic_bnw.jpg" alt="headshot" width="100%" height="100%">
 </div>
 
-<div style="margin-top: 40px;"> 
-	Hi, I am Nikola Milojevic-Dupont (he/they). 
-</div>
+<br>
+Hi, I am Nikola Milojevic-Dupont (he/they). 
 
 I am a **freelancer** based in Berlin, Germany. I am available for industry and research jobs that focus on deploying (geospatial) data science to tackle sustainability, urban governance, and other societal issues. My services include **consulting, data analysis or software development**.
 
