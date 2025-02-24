@@ -1,5 +1,5 @@
 title: 'milojevic-dupont.github.io'
-description: "PhD candidate, MCC Berlin & TU Berlin"
+description: "Freelancer"
 url: "https://milojevicdupontnikola.github.io"
 
 
@@ -10,8 +10,8 @@ header_pages:
 #   - publications.md
  
 style: dark
-
-footer: 'Last updated: 26.06.24 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
+  
+footer: 'Last updated: 24.02.25 - <a href="https://github.com/b2a3e8/jekyll-theme-console">theme</a>'
 
 # Build settings
 markdown: kramdown
