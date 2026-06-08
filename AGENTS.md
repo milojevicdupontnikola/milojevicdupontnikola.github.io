@@ -1,71 +1,149 @@
 # New Website — Landing Page
 
-Full-screen 3D geospatial landing page with 320 extruded Dutch building footprints rendered in Three.js on a black background.
+Full-screen 3D geospatial landing page with 320 extruded Dutch building footprints rendered in Three.js on a black background, with an animated intro sequence and typewriter title overlay.
+
+**Status**: live on GitHub Pages at `https://milojevicdupontnikola.github.io/`, served from the `new-website` branch.
 
 ## File Structure
 
 ```
 milojevicdupontnikola.github.io/
-├── index.html                      # Served at root, loads assets/index.js
-├── assets/index.js                 # Built Three.js bundle (502KB)
-├── footprints_centered.geojson     # 320 building footprints (EPSG:3035, centered at origin)
+├── index.html                      # Entry point, loads assets/index.js
+├── assets/index.js                 # Built Three.js bundle (~505KB)
+├── footprints_centered.geojson     # 320 building footprints (EPSG:3035, centered)
 ├── .nojekyll                       # Disables Jekyll on GitHub Pages
-├── AGENTS.md
-├── source/                         # Vite dev project
-│   ├── src/main.js                 # Scene, camera, renderer, labels, hover/click
+├── AGENTS.md                       # This file — project context
+├── source/                         # Vite dev project (all source files)
+│   ├── src/main.js                 # Scene, camera, animation, labels, hover/click
 │   ├── src/loadBuildings.js        # GeoJSON fetch, extrusion, glow, colors
 │   ├── index.html                  # Dev entry point (loads /src/main.js)
-│   ├── vite.config.js              # Vite config, stable output filename
+│   ├── vite.config.js              # Vite config (esnext target, stable filename)
 │   ├── package.json                # prebuild copies geojson to public/ first
-│   ├── public/.gitkeep             # (geojson copied here by prebuild)
+│   ├── public/.gitkeep             # geojson copied here by prebuild during dev
 │   ├── prepare_data.py             # Python script to center GeoJSON coords
 │   └── footprints.geojson          # Raw source data (EPSG:3035, uncentered)
 ```
 
-## How to Rebuild
+## Branch Management
+
+The website runs on the **`new-website`** branch. The `master` branch contains the old Jekyll site and is unused.
 
 ```sh
-cd source && npm install && npm run build
-# then copy outputs to root:
-cp source/dist/index.html ../
-cp source/dist/assets/* ../assets/
-cp source/dist/footprints_centered.geojson ../
+git checkout new-website   # switch to the active branch
 ```
+
+## Build & Deploy (Full Rebuild)
+
+Run these steps whenever you make changes to source files:
+
+```sh
+# 1. Go to source directory
+cd source
+
+# 2. Install dependencies (only needed first time or after dep changes)
+npm install
+
+# 3. Build the production bundle
+npm run build
+
+# 4. Copy build outputs to repo root (for GitHub Pages serving)
+cd ..
+cp source/dist/index.html .
+cp source/dist/assets/* assets/
+
+# 5. Clean up temp files (prebuild copies geojson to public/)
+rm -f source/public/footprints_centered.geojson
+rm -rf source/node_modules source/dist
+
+# 6. Verify what changed
+git diff --stat
+
+# 7. Stage, commit, and push
+git add -A
+git commit -m "description of changes"
+git push origin new-website
+```
+
+The site updates automatically on GitHub Pages after the push.
+
+## Quick Dev Workflow (no deploy)
+
+```sh
+cd source
+npm install      # if not already installed
+npm run dev      # starts Vite dev server at localhost:5173
+```
+
+The dev server auto-reloads on file changes. The geojson file is automatically copied to `public/` via the `predev` script.
+
+## Intro Animation (6 Phases)
+
+Total duration ~12s. Phases auto-advance based on clock.
+
+| # | Name | Start | Duration | What happens |
+|---|------|-------|----------|-------------|
+| 0 | PITCH_BLACK | 0.0s | - | Black screen, nothing visible |
+| 1 | EDGES | 0.8s | 1.5s | White building edges fade in, fill stays black |
+| 2 | SAMPLE_20 | 2.5s | instant | Random 20% of buildings snap to their year color instantly |
+| - | (pause) | 2.5–5.0s | 2.5s | Only 20% colored — dramatic pause |
+| 3 | ALL_COLOR | 5.0s | 1.8s | Remaining 80% transition from black to year color |
+| 4 | EXTRUDE | 7.5s | 1.5s | Buildings grow from flat to full height (staggered random delay per building, 0–0.8s) |
+| 5 | GLOW | 10.0s | 2.0s | Target buildings fade in with color, extrusion, glow, and labels. Typewriter title starts. |
+| DONE | - | 12.0s | - | Hover/click/bounce activated |
+
+**During animation**: target buildings are completely hidden (`visible = false`) until phase 5.
+
+## Title Overlay
+
+Appears during phase 5 via typewriter effect (left-to-right character reveal):
+
+- **Top 3%**: `Nikola Milojevic-Dupont – Scientific Consulting` (20px bold, white monospace)
+- **Bottom 3%**: `Geospatial Data + AI -> Climate + Cities` (20px bold, white monospace)
+- Line 1 types at 35ms/char, then line 2 types at 30ms/char after line 1 finishes
+- Fixed position, centered, z-index 20 (above 3D canvas)
 
 ## Key Technical Details
 
-- **Three.js 0.170.0**, Vite 5.4.21, Node 20
+- **Node 20**, **Three.js 0.170.0**, **Vite 5.4.21**
 - **Camera**: Perspective 45°, at (0, 280, 540), looking at origin
-- **Buildings**: ExtrudeGeometry with rotation.x = -PI/2 (maps northing → -Z)
-- **Heights**: top 15% area get 20–25m, rest get 10–15m
+- **Buildings**: ExtrudeGeometry with `rotation.x = -PI/2` (maps northing → -Z)
+- **Heights**: top 15% by area get 20–25m, rest get 10–15m (randomized)
 - **Colors**: mapped from year range 1630–2009 via earth-tone ramp (navy → teal → amber)
-- **Target saturation**: 1.8× for target buildings, 0.75× for others
-- **White edges**: LineBasicMaterial on EdgesGeometry
-- **Neon glow**: 3 layers per target building, AdditiveBlending, scales 1.008/1.02/1.04, pulsing via sine wave
-- **Labels**: CSS2DRenderer, monospace 14px uppercase, white fill + 2.5px black stroke, bold 900, letter-spacing 3px, opacity 0.95
-- **Label position**: y = height + 2 (just above building top), z = -centroid.z (negated for rotation)
-- **Bounce**: sin(elapsed * 1.5 + centroid.x) * 4
-- **Hover**: raycaster on pointermove, glow intensity ×1.8, color lerps 40% toward white
-- **Click**: logs to console (placeholder)
+- **Saturation**: target buildings 1.8×, others 0.75× (via HSL)
+- **White edges**: shared `LineBasicMaterial` on `EdgesGeometry`, starts at opacity 0, fades in phase 1
+- **Neon glow**: 3 layers per target building, `AdditiveBlending`, scales 1.008/1.02/1.04, pulsing via sine wave
+- **Extrusion animation**: `mesh.scale.z` and `line.scale.z` animate 0→1 (local Z is extrusion axis, maps to world Y after rotation)
+- **ABOUT label**: CSS2DRenderer, 14px uppercase monospace, white fill + 2.5px black stroke, bold 900, letter-spacing 3px
+- **PROJECTS label**: same style, positioned at different 3D centroid
+- **Label bounce**: `sin(elapsed * 1.5 + centroid.x) * 4`
+- **Hover**: raycaster on pointermove, glow intensity ×1.8, fill color lerps 40% toward white
+- **Click**: logs to console (placeholder for future navigation)
 
 ## Target Buildings
 
-| Label      | Building ID                                       | Glow Color |
-|------------|---------------------------------------------------|------------|
-| ABOUT      | NL32B_N326E397_Y2596.6553_X3343.2809              | #ff8800    |
-| PROJECTS   | NL32B_N326E397_Y2400.9044_X3394.3630              | #6688ff    |
+| Label | Building ID | Glow Color | Phase |
+|-------|-------------|------------|-------|
+| ABOUT | `NL32B_N326E397_Y2596.6553_X3343.2809` | `#ff8800` (warm orange) | hidden until phase 5 |
+| PROJECTS | `NL32B_N326E397_Y2400.9044_X3394.3630` | `#6688ff` (blue) | hidden until phase 5 |
+
+Both are rendered with normal fill + edges like all buildings, but their mesh/line/glow have `visible = false` until phase 5. Not included in `allBuildings[]` so phases 1–4 don't touch them.
 
 ## GeoJSON Data
 
 - Source: 320 Dutch building footprints from EUBUCCO
 - Original CRS: EPSG:3035
-- Coordinates centered at origin via `prepare_data.py` (subtract min x/y)
-- Each feature has `id` and `year` (1630–2009) properties
-- Single flat file at repo root, duplicated into `source/public/` via prebuild script
+- Coordinates centered at origin via `prepare_data.py` (subtracts min x/min y from all coords)
+- Each feature has `id` (string) and `year` (integer 1630–2009) properties
+- Single canonical file at repo root; copied into `source/public/` by `prebuild` script before Vite bundling
+- Also at root for production serving (`/footprints_centered.geojson`)
 
 ## Build Config
 
-- `vite.config.js` sets `build.target: 'esnext'` (needed for top-level await)
-- Stable output filename: `assets/index.js` (no hash)
-- `prebuild` script copies `../footprints_centered.geojson` into `public/` before Vite bundles it
-- Dev: `npm run dev` in `source/`
+- `vite.config.js`: `build.target: 'esnext'` (supports top-level await), stable output filename via `rollupOptions.output.entryFileNames: 'assets/index.js'`
+- `package.json`: `predev` and `prebuild` scripts copy `../footprints_centered.geojson` to `public/` so Vite serves/bundles it
+
+## Animations & CSS2DRenderer Layering
+
+- Labels use `CSS2DRenderer` with `zIndex: 10` (on top of WebGL canvas)
+- Title overlay uses fixed-position divs with `z-index: 20`
+- Both are added to `document.body` after the WebGL renderer's canvas
