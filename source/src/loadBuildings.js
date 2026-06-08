@@ -66,6 +66,7 @@ function addGlow(group, geom, pos, color) {
     })
     const mesh = new THREE.Mesh(g, m)
     mesh.rotation.x = -Math.PI / 2
+    mesh.scale.z = 0
     mesh.position.copy(pos)
     group.add(mesh)
     glows.push({ mesh, material: m, baseOpacity: layer.opacity })
@@ -92,7 +93,8 @@ export async function loadBuildings() {
   const areaThreshold = polyData[Math.floor(polyData.length * 0.85)].area
 
   const group = new THREE.Group()
-  const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff })
+  const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 })
+  const allBuildings = []
   const glowTargets = []
 
   for (const feature of features) {
@@ -120,8 +122,9 @@ export async function loadBuildings() {
 
     const color = yearColor(t)
     adjustSaturation(color, isTarget ? 1.8 : 0.75)
+    const baseColor = color.clone()
     const fillMat = new THREE.MeshBasicMaterial({
-      color,
+      color: 0x000000,
       side: THREE.DoubleSide,
     })
 
@@ -135,21 +138,34 @@ export async function loadBuildings() {
 
     const mesh = new THREE.Mesh(geom, fillMat)
     mesh.rotation.x = -Math.PI / 2
+    mesh.scale.z = 0
     group.add(mesh)
 
     const edges = new THREE.EdgesGeometry(geom)
     const line = new THREE.LineSegments(edges, edgeMat)
     line.rotation.x = -Math.PI / 2
+    line.scale.z = 0
     group.add(line)
 
+    const extrudeDelay = Math.random() * 0.8
+    const colorPhase = Math.random() < 0.2 ? 2 : 3
+
+    if (!isTarget) {
+      allBuildings.push({ mesh, line, material: fillMat, baseColor, height, extrudeDelay, colorPhase })
+    }
+
     if (isTarget) {
+      mesh.visible = false
+      line.visible = false
       const isBlue = feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630'
-      const baseColor = color.clone()
       const glows = addGlow(group, geom, mesh.position, isBlue ? 0x6688ff : 0xff8800)
+      for (const g of glows) {
+        g.mesh.visible = false
+      }
       const centroid = polygonCentroid(exterior)
-      glowTargets.push({ glows, mesh, material: fillMat, baseColor, line, height, centroid, label: isBlue ? 'Projects' : 'About' })
+      glowTargets.push({ glows, mesh, material: fillMat, baseColor, line, height, centroid, label: isBlue ? 'Projects' : 'About', extrudeDelay })
     }
   }
 
-  return { group, glowTargets }
+  return { group, glowTargets, allBuildings }
 }

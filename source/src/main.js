@@ -30,7 +30,23 @@ window.addEventListener('resize', () => {
   labelRenderer.setSize(window.innerWidth, window.innerHeight)
 })
 
-const { group, glowTargets } = await loadBuildings()
+const PHASES = {
+  PITCH_BLACK: 0,
+  EDGES: 1,
+  SAMPLE_20: 2,
+  ALL_COLOR: 3,
+  EXTRUDE: 4,
+  GLOW: 5,
+}
+
+const PHASE = {
+  start: [0, 0.8, 2.5, 5.0, 7.5, 10.0],
+  dur:   [0, 1.5, 0.1, 1.8, 1.5, 2.0],
+}
+
+function phaseEnd(i) { return PHASE.start[i] + PHASE.dur[i] }
+
+const { group, glowTargets, allBuildings } = await loadBuildings()
 scene.add(group)
 
 const labels = []
@@ -46,14 +62,13 @@ for (const target of glowTargets) {
   el.style.textShadow = '0 0 20px rgba(0, 0, 0, 0.8)'
   el.style.letterSpacing = '3px'
   el.style.textTransform = 'uppercase'
-  el.style.opacity = '0.95'
+  el.style.opacity = '0'
   el.style.cursor = 'pointer'
   el.style.pointerEvents = 'auto'
 
   const yOff = target.height + 2
   const lx = target.centroid.x
   const lz = -target.centroid.z
-  console.log('Label:', target.label, 'at', lx.toFixed(1), yOff.toFixed(1), lz.toFixed(1))
 
   const label = new CSS2DObject(el)
   label.position.set(lx, yOff, lz)
@@ -61,12 +76,55 @@ for (const target of glowTargets) {
   labels.push({ label, target, el, baseY: yOff })
 }
 
+const TITLE_LINE1 = 'Nikola Milojevic-Dupont \u2013 Scientific Consulting'
+const TITLE_LINE2 = 'Geospatial Data + AI  ->  Climate + Cities'
+
+const TITLE_CLASS = 'position: fixed; left: 50%; transform: translateX(-50%); z-index: 20; text-align: center; font-family: monospace; color: #fff; opacity: 0; pointer-events: none;'
+const LINE_CLASS = 'font-size: 20px; font-weight: 700; letter-spacing: 2px; white-space: nowrap; overflow: hidden; min-height: 1.4em;'
+
+const titleLine1 = document.createElement('div')
+titleLine1.style.cssText = TITLE_CLASS + ' top: 3%; ' + LINE_CLASS
+document.body.appendChild(titleLine1)
+
+const titleLine2Div = document.createElement('div')
+titleLine2Div.style.cssText = TITLE_CLASS + ' bottom: 3%; ' + LINE_CLASS
+document.body.appendChild(titleLine2Div)
+
+let titleStarted = false
+const titleTimers = []
+
+function runTitleWriter() {
+  titleStarted = true
+  titleLine1.style.opacity = '1'
+  titleLine2Div.style.opacity = '1'
+  let i = 0
+  const t1 = setInterval(() => {
+    titleLine1.textContent += TITLE_LINE1[i]
+    i++
+    if (i >= TITLE_LINE1.length) {
+      clearInterval(t1)
+      let j = 0
+      const t2 = setInterval(() => {
+        titleLine2Div.textContent += TITLE_LINE2[j]
+        j++
+        if (j >= TITLE_LINE2.length) {
+          clearInterval(t2)
+        }
+      }, 30)
+      titleTimers.push(t2)
+    }
+  }, 35)
+  titleTimers.push(t1)
+}
+
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
 const hovered = new Set()
 const meshes = glowTargets.map(t => t.mesh)
+let animDone = false
 
 renderer.domElement.addEventListener('pointermove', e => {
+  if (!animDone) return
   pointer.x = (e.clientX / window.innerWidth) * 2 - 1
   pointer.y = -(e.clientY / window.innerHeight) * 2 + 1
   raycaster.setFromCamera(pointer, camera)
@@ -80,6 +138,7 @@ renderer.domElement.addEventListener('pointermove', e => {
 })
 
 renderer.domElement.addEventListener('click', () => {
+  if (!animDone) return
   for (const target of hovered) {
     console.log('Clicked:', target.label, target.mesh.position)
   }
@@ -87,9 +146,91 @@ renderer.domElement.addEventListener('click', () => {
 
 const clock = new THREE.Clock()
 
+function progress(elapsed, phaseIdx) {
+  return Math.min(1, Math.max(0, (elapsed - PHASE.start[phaseIdx]) / PHASE.dur[phaseIdx]))
+}
+
 function animate() {
   requestAnimationFrame(animate)
   const elapsed = clock.getElapsedTime()
+
+  // phase 1: edges fade in
+  if (elapsed >= PHASE.start[PHASES.EDGES] && elapsed < phaseEnd(PHASES.EDGES)) {
+    const p = progress(elapsed, PHASES.EDGES)
+    if (allBuildings.length > 0) allBuildings[0].line.material.opacity = p
+  } else if (elapsed >= phaseEnd(PHASES.EDGES)) {
+    if (allBuildings.length > 0) allBuildings[0].line.material.opacity = 1
+  }
+
+  // phase 2: random 20% buildings snap to color instantly
+  if (elapsed >= PHASE.start[PHASES.SAMPLE_20] && elapsed < phaseEnd(PHASES.SAMPLE_20)) {
+    for (const b of allBuildings) {
+      if (b.colorPhase === 2) {
+        b.material.color.copy(b.baseColor)
+      }
+    }
+  }
+
+  // phase 3: remaining 80% get color
+  if (elapsed >= PHASE.start[PHASES.ALL_COLOR]) {
+    const p = elapsed < phaseEnd(PHASES.ALL_COLOR) ? progress(elapsed, PHASES.ALL_COLOR) : 1
+    for (const b of allBuildings) {
+      if (b.colorPhase === 3) {
+        b.material.color.copy(b.baseColor).multiplyScalar(p)
+      }
+    }
+  }
+
+  // phase 4: extrusion with staggered random delay
+  if (elapsed >= PHASE.start[PHASES.EXTRUDE]) {
+    for (const b of allBuildings) {
+      const start = PHASE.start[PHASES.EXTRUDE] + b.extrudeDelay
+      const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
+      b.mesh.scale.z = p
+      b.line.scale.z = p
+    }
+    for (const target of glowTargets) {
+      const start = PHASE.start[PHASES.EXTRUDE] + target.extrudeDelay
+      const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
+      for (const g of target.glows) {
+        g.mesh.scale.z = p
+      }
+    }
+  }
+
+  // phase 5: special buildings fade in smoothly with glow + labels
+  if (elapsed >= PHASE.start[PHASES.GLOW]) {
+    if (!titleStarted) runTitleWriter()
+    const p = elapsed < phaseEnd(PHASES.GLOW) ? progress(elapsed, PHASES.GLOW) : 1
+    for (const target of glowTargets) {
+      target.mesh.visible = true
+      target.line.visible = true
+      target.material.color.copy(target.baseColor).multiplyScalar(p)
+      target.mesh.scale.z = p
+      target.line.scale.z = p
+      for (const g of target.glows) {
+        g.mesh.visible = true
+        g.mesh.scale.z = p
+        g.material.opacity = g.baseOpacity * p
+      }
+    }
+    for (const l of labels) {
+      l.el.style.opacity = String(0.95 * p)
+    }
+  }
+
+  // check if animation is done
+  if (elapsed >= phaseEnd(PHASES.GLOW)) {
+    animDone = true
+  }
+
+  if (!animDone) {
+    renderer.render(scene, camera)
+    labelRenderer.render(scene, camera)
+    return
+  }
+
+  // post-animation: glow pulse, hover, bounce
   const t = Math.sin(elapsed * 2) * 0.5 + 0.5
 
   for (const target of glowTargets) {
