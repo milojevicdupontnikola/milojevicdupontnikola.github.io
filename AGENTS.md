@@ -89,7 +89,7 @@ Total duration ~12s. Phases auto-advance based on clock.
 | 3 | ALL_COLOR | 5.0s | 1.8s | Remaining 80% transition from black to year color |
 | 4 | EXTRUDE | 7.5s | 1.5s | Buildings grow from flat to full height (staggered random delay per building, 0–0.8s) |
 | 5 | TITLE | 10.0s | - | Title typewriter starts (line 1 at 35ms/char, then line 2 at 30ms/char) |
-| - | REVEAL | after title | 1.5s | Target buildings fade in with glow + labels after typewriter finishes (both lines complete) |
+| - | REVEAL | after title + 1s | 2.5s | Target buildings fade in with glow + labels after 1s pause following typewriter completion |
 | DONE | - | after reveal | - | Hover/click/bounce activated |
 
 **During animation**: target buildings are completely hidden (`visible = false`) until phase 5.
@@ -101,7 +101,7 @@ Appears during phase 5 via typewriter effect (left-to-right character reveal):
 - **Top 3%**: `Nikola Milojevic-Dupont – Scientific Consulting` (20px bold, white monospace)
 - **Bottom 3%**: `Geospatial Data + AI -> Climate + Cities` (20px bold, white monospace)
 - Line 1 types at 35ms/char (~1.6s), then line 2 types at 30ms/char (~1.3s) after line 1 finishes
-- **Target buildings only appear after the typewriter fully completes** — they fade in over 1.5s after both lines are done
+- **Target buildings only appear after the typewriter fully completes** — 1s pause, then fade in over 2.5s
 - Fixed position, centered, z-index 20 (above 3D canvas)
 
 ## Key Technical Details

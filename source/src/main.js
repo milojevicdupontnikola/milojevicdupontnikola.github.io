@@ -93,6 +93,8 @@ document.body.appendChild(titleLine2Div)
 let titleStarted = false
 let titleComplete = false
 let revealStartTime = 0
+const REVEAL_DELAY = 1.0
+const REVEAL_DUR = 2.5
 const titleTimers = []
 
 function runTitleWriter() {
@@ -206,10 +208,12 @@ function animate() {
     runTitleWriter()
   }
 
-  // after title completes, reveal target buildings
+  // after title completes with delay, reveal target buildings
   if (titleComplete) {
     if (revealStartTime === 0) revealStartTime = elapsed
-    const p = Math.min(1, (elapsed - revealStartTime) / 1.5)
+    const delay = REVEAL_DELAY
+    const t = Math.max(0, elapsed - revealStartTime - delay)
+    const p = Math.min(1, t / REVEAL_DUR)
     for (const target of glowTargets) {
       target.mesh.visible = true
       target.line.visible = true
