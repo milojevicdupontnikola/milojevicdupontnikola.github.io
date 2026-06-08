@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "cp ../footprints_centered.geojson public/",
     "dev": "vite",
+    "prebuild": "cp ../footprints_centered.geojson public/",
     "build": "vite build"
   },
   "dependencies": {
