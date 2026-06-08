@@ -88,8 +88,9 @@ Total duration ~12s. Phases auto-advance based on clock.
 | - | (pause) | 2.5–5.0s | 2.5s | Only 20% colored — dramatic pause |
 | 3 | ALL_COLOR | 5.0s | 1.8s | Remaining 80% transition from black to year color |
 | 4 | EXTRUDE | 7.5s | 1.5s | Buildings grow from flat to full height (staggered random delay per building, 0–0.8s) |
-| 5 | GLOW | 10.0s | 2.0s | Target buildings fade in with color, extrusion, glow, and labels. Typewriter title starts. |
-| DONE | - | 12.0s | - | Hover/click/bounce activated |
+| 5 | TITLE | 10.0s | - | Title typewriter starts (line 1 at 35ms/char, then line 2 at 30ms/char) |
+| - | REVEAL | after title | 1.5s | Target buildings fade in with glow + labels after typewriter finishes (both lines complete) |
+| DONE | - | after reveal | - | Hover/click/bounce activated |
 
 **During animation**: target buildings are completely hidden (`visible = false`) until phase 5.
 
@@ -99,7 +100,8 @@ Appears during phase 5 via typewriter effect (left-to-right character reveal):
 
 - **Top 3%**: `Nikola Milojevic-Dupont – Scientific Consulting` (20px bold, white monospace)
 - **Bottom 3%**: `Geospatial Data + AI -> Climate + Cities` (20px bold, white monospace)
-- Line 1 types at 35ms/char, then line 2 types at 30ms/char after line 1 finishes
+- Line 1 types at 35ms/char (~1.6s), then line 2 types at 30ms/char (~1.3s) after line 1 finishes
+- **Target buildings only appear after the typewriter fully completes** — they fade in over 1.5s after both lines are done
 - Fixed position, centered, z-index 20 (above 3D canvas)
 
 ## Key Technical Details
@@ -123,10 +125,10 @@ Appears during phase 5 via typewriter effect (left-to-right character reveal):
 
 | Label | Building ID | Glow Color | Phase |
 |-------|-------------|------------|-------|
-| ABOUT | `NL32B_N326E397_Y2596.6553_X3343.2809` | `#ff8800` (warm orange) | hidden until phase 5 |
-| PROJECTS | `NL32B_N326E397_Y2400.9044_X3394.3630` | `#6688ff` (blue) | hidden until phase 5 |
+| ABOUT | `NL32B_N326E397_Y2596.6553_X3343.2809` | `#ff8800` (warm orange) | hidden until typewriter finishes, then fade in over 1.5s |
+| PROJECTS | `NL32B_N326E397_Y2400.9044_X3394.3630` | `#6688ff` (blue) | hidden until typewriter finishes, then fade in over 1.5s |
 
-Both are rendered with normal fill + edges like all buildings, but their mesh/line/glow have `visible = false` until phase 5. Not included in `allBuildings[]` so phases 1–4 don't touch them.
+Both are rendered with normal fill + edges like all buildings, but their mesh/line/glow have `visible = false` until the title typewriter completes both lines. Not included in `allBuildings[]` so phases 1–4 don't touch them.
 
 ## GeoJSON Data
 

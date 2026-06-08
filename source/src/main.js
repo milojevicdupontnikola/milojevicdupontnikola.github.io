@@ -91,6 +91,8 @@ titleLine2Div.style.cssText = TITLE_CLASS + ' bottom: 3%; ' + LINE_CLASS
 document.body.appendChild(titleLine2Div)
 
 let titleStarted = false
+let titleComplete = false
+let revealStartTime = 0
 const titleTimers = []
 
 function runTitleWriter() {
@@ -109,6 +111,7 @@ function runTitleWriter() {
         j++
         if (j >= TITLE_LINE2.length) {
           clearInterval(t2)
+          titleComplete = true
         }
       }, 30)
       titleTimers.push(t2)
@@ -198,10 +201,15 @@ function animate() {
     }
   }
 
-  // phase 5: special buildings fade in smoothly with glow + labels
-  if (elapsed >= PHASE.start[PHASES.GLOW]) {
-    if (!titleStarted) runTitleWriter()
-    const p = elapsed < phaseEnd(PHASES.GLOW) ? progress(elapsed, PHASES.GLOW) : 1
+  // phase 5: title starts typing
+  if (elapsed >= PHASE.start[PHASES.GLOW] && !titleStarted) {
+    runTitleWriter()
+  }
+
+  // after title completes, reveal target buildings
+  if (titleComplete) {
+    if (revealStartTime === 0) revealStartTime = elapsed
+    const p = Math.min(1, (elapsed - revealStartTime) / 1.5)
     for (const target of glowTargets) {
       target.mesh.visible = true
       target.line.visible = true
@@ -210,18 +218,13 @@ function animate() {
       target.line.scale.z = p
       for (const g of target.glows) {
         g.mesh.visible = true
-        g.mesh.scale.z = p
         g.material.opacity = g.baseOpacity * p
       }
     }
     for (const l of labels) {
       l.el.style.opacity = String(0.95 * p)
     }
-  }
-
-  // check if animation is done
-  if (elapsed >= phaseEnd(PHASES.GLOW)) {
-    animDone = true
+    if (p >= 1 && !animDone) animDone = true
   }
 
   if (!animDone) {
