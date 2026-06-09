@@ -46,8 +46,11 @@ const PHASE = {
 
 function phaseEnd(i) { return PHASE.start[i] + PHASE.dur[i] }
 
+const container = new THREE.Group()
+scene.add(container)
+
 const { group, glowTargets, allBuildings } = await loadBuildings()
-scene.add(group)
+container.add(group)
 
 const labels = []
 for (const target of glowTargets) {
@@ -72,7 +75,7 @@ for (const target of glowTargets) {
 
   const label = new CSS2DObject(el)
   label.position.set(lx, yOff, lz)
-  scene.add(label)
+  container.add(label)
   labels.push({ label, target, el, baseY: yOff })
 }
 
@@ -124,7 +127,7 @@ function runTitleWriter() {
 
 // --- About section ---
 
-const ABOUT_CAM_X = 280
+const SLIDE_X = 200
 const SLIDE_DUR = 1.2
 let aboutActive = false
 let slideStartTime = 0
@@ -140,15 +143,12 @@ aboutPanel.id = 'about-panel'
 aboutPanel.style.cssText = [
   'position: fixed',
   'right: 0',
-  'top: 0',
+  'top: 10%',
   'width: 44%',
-  'height: 100%',
+  'height: 80%',
   'z-index: 25',
   'font-family: monospace',
   'color: #fff',
-  'display: flex',
-  'flex-direction: column',
-  'justify-content: center',
   'pointer-events: none',
   'opacity: 0',
   'transform: translateX(100%)',
@@ -158,10 +158,11 @@ document.body.appendChild(aboutPanel)
 
 const aboutInner = document.createElement('div')
 aboutInner.style.cssText = [
-  'padding: 10% 8%',
-  'max-height: 80%',
+  'padding: 4% 8% 0 8%',
+  'height: 100%',
   'overflow-y: auto',
   'pointer-events: auto',
+  'box-sizing: border-box',
 ].join(';') + ';'
 aboutPanel.appendChild(aboutInner)
 
@@ -184,33 +185,33 @@ aboutBody.style.cssText = [
   'line-height: 1.7',
   'letter-spacing: 0.5px',
   'opacity: 0',
-  'white-space: pre-wrap',
 ].join(';') + ';'
-aboutBody.textContent = [
+
+const bodyParagraphs = [
   'I am a freelancer based in Berlin, Germany.',
-  '',
   'I am available for missions in the space of AI, geospatial data, climate change, urban planning \u2013 or an intersection of these topics.',
-  '',
   'My expertise includes:',
-  '',
   '\u2022 Data science project implementation',
   '\u2022 Consulting, management, or auditing of AI for Climate projects',
   '\u2022 Development and delivery of education programs',
-  '______________________________________________',
-  '',
   'My work has broadly investigated the pathway from research to deployment of AI systems for climate action in cities, focusing on narratives, data needs, tool development, and practical deployment considerations. I have particular expertise in geospatial data science, gained, for example, from leading the development of the EUBUCCO building stock dataset (eubucco.com).',
-  '',
   'I hold a PhD from the Technical University Berlin and wrote my doctoral dissertation on \u201CGeospatial artificial intelligence for scaling low-carbon planning\u201D under the supervision of Felix Creutzig. I worked for 7 years in Felix Creutzig\u2019s lab at MCC Berlin, now part of the renowned Potsdam Institute for Climate Impact Research (PIK).',
-  '',
   'I am also a founding member of Climate Change AI (CCAI), a global non-profit aiming to catalyze impactful work at the intersection of climate change and machine learning, where I have taken on various roles, including chairing the organization\u2019s educational content committee and being a member of its board of directors.',
-].join('\n\n')
+]
+for (let i = 0; i < bodyParagraphs.length; i++) {
+  const p = document.createElement('p')
+  p.textContent = bodyParagraphs[i]
+  p.style.margin = '0 0 0.6em 0'
+  if (i === 6) p.style.marginTop = '1.2em'
+  aboutBody.appendChild(p)
+}
 aboutInner.appendChild(aboutBody)
 
 const closeBtn = document.createElement('span')
 closeBtn.textContent = '[ close ]'
 closeBtn.style.cssText = [
   'display: inline-block',
-  'margin-top: 32px',
+  'margin-top: 6px',
   'font-size: 14px',
   'font-weight: 700',
   'letter-spacing: 2px',
@@ -251,8 +252,6 @@ function openAbout() {
   aboutActive = true
   slideDir = 1
   slideStartTime = clock.getElapsedTime()
-  titleLine1.style.opacity = '0'
-  titleLine2Div.style.opacity = '0'
   for (const l of labels) {
     l.el.style.opacity = '0'
   }
@@ -265,8 +264,6 @@ function closeAbout() {
   aboutActive = false
   slideDir = -1
   slideStartTime = clock.getElapsedTime()
-  titleLine1.style.opacity = '1'
-  titleLine2Div.style.opacity = '1'
   for (const l of labels) {
     l.el.style.opacity = '0.95'
   }
@@ -385,14 +382,13 @@ function animate() {
     if (p >= 1 && !animDone) animDone = true
   }
 
-  // camera slide for about section
+  // slide scene left for about section
   if (slideDir !== 0) {
     const t = Math.min(1, (elapsed - slideStartTime) / SLIDE_DUR)
     const et = easeInOutQuad(t)
-    const srcX = slideDir === 1 ? 0 : ABOUT_CAM_X
-    const dstX = slideDir === 1 ? ABOUT_CAM_X : 0
-    camera.position.x = srcX + (dstX - srcX) * et
-    camera.lookAt(0, 0, 0)
+    const srcX = slideDir === 1 ? 0 : -SLIDE_X
+    const dstX = slideDir === 1 ? -SLIDE_X : 0
+    container.position.x = srcX + (dstX - srcX) * et
     const panelSrc = slideDir === 1 ? 100 : 0
     const panelDst = slideDir === 1 ? 0 : 100
     const tx = panelSrc + (panelDst - panelSrc) * et
