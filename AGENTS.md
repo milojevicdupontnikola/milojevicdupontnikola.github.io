@@ -119,14 +119,15 @@ Appears during phase 5 via typewriter effect (left-to-right character reveal):
 - **PROJECTS label**: same style, positioned at different 3D centroid
 - **Label bounce**: `sin(elapsed * 1.5 + centroid.x) * 4`
 - **Hover**: raycaster on pointermove, glow intensity ×1.8, fill color lerps 40% toward white
-- **Click**: logs to console (placeholder for future navigation)
+- **ABOUT click**: camera slides right (x: 0 → 280) over 1.2s (easeInOutQuad), title fades, labels fade, About panel slides in from right. "About" heading typewrites, then body text fades in. `[ close ]` reverses everything.
+- **PROJECTS click**: logs to console (placeholder for future navigation)
 
 ## Target Buildings
 
 | Label | Building ID | Glow Color | Phase |
 |-------|-------------|------------|-------|
-| ABOUT | `NL32B_N326E397_Y2596.6553_X3343.2809` | `#ff8800` (warm orange) | hidden until typewriter finishes, then fade in over 1.5s |
-| PROJECTS | `NL32B_N326E397_Y2400.9044_X3394.3630` | `#6688ff` (blue) | hidden until typewriter finishes, then fade in over 1.5s |
+| ABOUT | `NL32B_N326E397_Y2596.6553_X3343.2809` | `#ff8800` (warm orange) | hidden until typewriter finishes, then fade in over 2.5s |
+| PROJECTS | `NL32B_N326E397_Y2400.9044_X3394.3630` | `#6688ff` (blue) | hidden until typewriter finishes, then fade in over 2.5s |
 
 Both are rendered with normal fill + edges like all buildings, but their mesh/line/glow have `visible = false` until the title typewriter completes both lines. Not included in `allBuildings[]` so phases 1–4 don't touch them.
 
@@ -148,4 +149,30 @@ Both are rendered with normal fill + edges like all buildings, but their mesh/li
 
 - Labels use `CSS2DRenderer` with `zIndex: 10` (on top of WebGL canvas)
 - Title overlay uses fixed-position divs with `z-index: 20`
-- Both are added to `document.body` after the WebGL renderer's canvas
+- About panel uses fixed-position div with `z-index: 25`
+- All are added to `document.body` after the WebGL renderer's canvas
+
+## About Section (Interactive)
+
+**Trigger**: Click the ABOUT building after the intro animation completes.
+
+**Behavior**:
+- Camera slides from `(0, 280, 540)` → `(280, 280, 540)` over 1.2s with easeInOutQuad easing. Scene size stays the same — only horizontal position changes.
+- Title overlay and CSS2D labels fade out
+- About panel (fixed, right 44%, full height) slides in from right
+- "About" heading typewrites char-by-char at 35ms/char
+- Body text fades in over 0.6s after heading finishes
+- `[ close ]` button at bottom: reverses the entire process (camera slides back, title/labels reappear, panel slides out)
+
+**Body content**: Monospace 14px, line-height 1.7, letter-spacing 0.5px, white-space pre-wrap for paragraph breaks.
+
+**Edge cases**:
+- Clicking ABOUT while transition is in progress is blocked (`slideDir !== 0` guard)
+- Clicking `[ close ]` while transitioning is similarly blocked
+- About mode does not affect the post-animation glow/hover/bounce loop (runs in background)
+- PROJECTS building click still logs to console placeholder
+
+**Styling**:
+- Panel: `padding: 10% 8%`, `max-height: 80%`, `overflow-y: auto` for scrollable content
+- Close button: `pointer-events: auto` within panel, hover glow via text-shadow
+- Body text areas: clicking and scrolling work via `pointer-events: auto` on inner container
