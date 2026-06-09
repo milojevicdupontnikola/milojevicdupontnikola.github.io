@@ -83,7 +83,7 @@ const TITLE_LINE1 = 'Nikola Milojevic-Dupont \u2013 Scientific Consulting'
 const TITLE_LINE2 = 'Geospatial Data + AI  ->  Climate + Cities'
 
 const TITLE_CLASS = 'position: fixed; left: 50%; transform: translateX(-50%); z-index: 20; text-align: center; font-family: monospace; color: #fff; opacity: 0; pointer-events: none;'
-const LINE_CLASS = 'font-size: 20px; font-weight: 700; letter-spacing: 2px; white-space: nowrap; overflow: hidden; min-height: 1.4em;'
+const LINE_CLASS = 'font-size: 24px; font-weight: 700; letter-spacing: 2px; white-space: nowrap; overflow: hidden; min-height: 1.4em;'
 
 const titleLine1 = document.createElement('div')
 titleLine1.style.cssText = TITLE_CLASS + ' top: 3%; ' + LINE_CLASS
@@ -93,36 +93,112 @@ const titleLine2Div = document.createElement('div')
 titleLine2Div.style.cssText = TITLE_CLASS + ' bottom: 3%; ' + LINE_CLASS
 document.body.appendChild(titleLine2Div)
 
+const SUBTITLES = [
+  'Where sensing our environment produced digital representation...',
+  '...using AI to enhance sense-making capabilities...',
+  '...to tackle socio-environmental challenges.',
+]
+const subtitleEl = document.createElement('div')
+subtitleEl.style.cssText = [
+  'position: fixed',
+  'top: 14%',
+  'right: 5%',
+  'z-index: 20',
+  'font-family: monospace',
+  'color: #fff',
+  'font-size: 16px',
+  'font-weight: 700',
+  'letter-spacing: 1px',
+  'opacity: 0',
+  'pointer-events: none',
+  'text-align: right',
+  'overflow: hidden',
+  'white-space: nowrap',
+].join(';') + ';'
+document.body.appendChild(subtitleEl)
+
+const cursorStyle = document.createElement('style')
+cursorStyle.textContent = '@keyframes cur-blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }'
+document.head.appendChild(cursorStyle)
+
+function makeCursor() {
+  const s = document.createElement('span')
+  s.textContent = '\u2588'
+  s.style.animation = 'cur-blink 0.8s step-end infinite'
+  return s
+}
+
 let titleStarted = false
 let titleComplete = false
-let revealStartTime = 0
-const REVEAL_DELAY = 1.0
-const REVEAL_DUR = 2.5
+let titleEndTime = 0
 const titleTimers = []
 
 function runTitleWriter() {
   titleStarted = true
   titleLine1.style.opacity = '1'
   titleLine2Div.style.opacity = '1'
+  const txt1 = document.createTextNode('')
+  const cur1 = makeCursor()
+  titleLine1.innerHTML = ''
+  titleLine1.appendChild(txt1)
+  titleLine1.appendChild(cur1)
   let i = 0
   const t1 = setInterval(() => {
-    titleLine1.textContent += TITLE_LINE1[i]
+    txt1.textContent = TITLE_LINE1.substring(0, i + 1)
     i++
     if (i >= TITLE_LINE1.length) {
       clearInterval(t1)
+      titleLine1.removeChild(cur1)
+      const txt2 = document.createTextNode('')
+      const cur2 = makeCursor()
+      titleLine2Div.innerHTML = ''
+      titleLine2Div.appendChild(txt2)
+      titleLine2Div.appendChild(cur2)
       let j = 0
       const t2 = setInterval(() => {
-        titleLine2Div.textContent += TITLE_LINE2[j]
+        txt2.textContent = TITLE_LINE2.substring(0, j + 1)
         j++
         if (j >= TITLE_LINE2.length) {
           clearInterval(t2)
+          titleLine2Div.removeChild(cur2)
           titleComplete = true
         }
-      }, 30)
+      }, 50)
       titleTimers.push(t2)
     }
-  }, 35)
+  }, 60)
   titleTimers.push(t1)
+}
+
+// animation state machine
+let st = 0 // 0=sub1 typing, 1=sub1 hold, 2=color, 3=extrude+sub2, 4=sub2 hold, 5=glow+sub3, 6=sub3 hold, 7=title, 8=done
+let stStart = 0
+
+let subIdx = -1
+let subTypingDone = false
+let subHoldUntil = 0
+
+function startSubtitle(idx) {
+  if (idx >= SUBTITLES.length) return
+  subIdx = idx
+  subTypingDone = false
+  subtitleEl.innerHTML = ''
+  subtitleEl.style.transition = 'opacity 0s'
+  subtitleEl.style.opacity = '1'
+  const txt = document.createTextNode('')
+  const cur = makeCursor()
+  subtitleEl.appendChild(txt)
+  subtitleEl.appendChild(cur)
+  let i = 0
+  const t = setInterval(() => {
+    txt.textContent = SUBTITLES[idx].substring(0, i + 1)
+    i++
+    if (i >= SUBTITLES[idx].length) {
+      clearInterval(t)
+      subtitleEl.removeChild(cur)
+      subTypingDone = true
+    }
+  }, 60)
 }
 
 // --- About section ---
@@ -202,6 +278,7 @@ for (let i = 0; i < bodyParagraphs.length; i++) {
   const p = document.createElement('p')
   p.textContent = bodyParagraphs[i]
   p.style.margin = '0 0 0.6em 0'
+  if (i >= 3 && i <= 5) p.style.fontWeight = '700'
   if (i === 6) p.style.marginTop = '1.2em'
   aboutBody.appendChild(p)
 }
@@ -227,24 +304,29 @@ aboutInner.appendChild(closeBtn)
 closeBtn.addEventListener('click', closeAbout)
 
 function runAboutTypewriter() {
-  aboutHeading.textContent = ''
   aboutBody.style.opacity = '0'
   closeBtn.style.opacity = '0'
   aboutTypingDone = false
+  aboutHeading.innerHTML = ''
+  const txt = document.createTextNode('')
+  const cur = makeCursor()
+  aboutHeading.appendChild(txt)
+  aboutHeading.appendChild(cur)
   let i = 0
   const word = 'About'
   const t = setInterval(() => {
-    aboutHeading.textContent += word[i]
+    txt.textContent = word.substring(0, i + 1)
     i++
     if (i >= word.length) {
       clearInterval(t)
+      aboutHeading.removeChild(cur)
       aboutTypingDone = true
       aboutBody.style.transition = 'opacity 0.6s'
       aboutBody.style.opacity = '1'
       closeBtn.style.transition = 'opacity 0.6s'
       closeBtn.style.opacity = '1'
     }
-  }, 35)
+  }, 60)
 }
 
 function openAbout() {
@@ -310,7 +392,7 @@ function animate() {
   requestAnimationFrame(animate)
   const elapsed = clock.getElapsedTime()
 
-  // phase 1: edges fade in
+  // edges fade in (fixed time)
   if (elapsed >= PHASE.start[PHASES.EDGES] && elapsed < phaseEnd(PHASES.EDGES)) {
     const p = progress(elapsed, PHASES.EDGES)
     if (allBuildings.length > 0) allBuildings[0].line.material.opacity = p
@@ -318,68 +400,115 @@ function animate() {
     if (allBuildings.length > 0) allBuildings[0].line.material.opacity = 1
   }
 
-  // phase 2: random 20% buildings snap to color instantly
-  if (elapsed >= PHASE.start[PHASES.SAMPLE_20] && elapsed < phaseEnd(PHASES.SAMPLE_20)) {
+  // phase 2+: snapshot 20% + state machine
+  if (elapsed >= PHASE.start[PHASES.SAMPLE_20]) {
     for (const b of allBuildings) {
-      if (b.colorPhase === 2) {
-        b.material.color.copy(b.baseColor)
+      if (b.colorPhase === 2) b.material.color.copy(b.baseColor)
+    }
+
+    if (subIdx === -1) {
+      startSubtitle(0)
+      stStart = elapsed
+    }
+
+    // 0: sub1 typing
+    if (st === 0 && subTypingDone) {
+      st = 1
+      subHoldUntil = elapsed + 2.0
+    }
+    // 1: sub1 hold
+    if (st === 1 && elapsed >= subHoldUntil) {
+      subtitleEl.style.transition = 'opacity 0.3s'
+      subtitleEl.style.opacity = '0'
+      st = 2
+      stStart = elapsed
+    }
+    // 2: color fill
+    if (st >= 2) {
+      const p = st === 2 ? Math.min(1, (elapsed - stStart) / PHASE.dur[PHASES.ALL_COLOR]) : 1
+      for (const b of allBuildings) {
+        if (b.colorPhase === 3) b.material.color.copy(b.baseColor).multiplyScalar(p)
+      }
+      if (st === 2 && p >= 1) {
+        st = 3
+        stStart = elapsed
+        startSubtitle(1)
+      }
+    }
+    // 3: extrusion + sub2 typing
+    if (st === 3) {
+      for (const b of allBuildings) {
+        const start = stStart + b.extrudeDelay
+        const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
+        b.mesh.scale.z = p
+        b.line.scale.z = p
+      }
+      for (const target of glowTargets) {
+        const start = stStart + target.extrudeDelay
+        const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
+        for (const g of target.glows) g.mesh.scale.z = p
+      }
+      if (subTypingDone && subIdx === 1) {
+        st = 4
+        subHoldUntil = elapsed + 2.0
+      }
+    }
+    // 4: sub2 hold
+    if (st === 4 && elapsed >= subHoldUntil) {
+      subtitleEl.style.transition = 'opacity 0.3s'
+      subtitleEl.style.opacity = '0'
+      st = 5
+      stStart = elapsed
+      startSubtitle(2)
+    }
+    // 5: glow instant + sub3 typing + pulsing
+    if (st >= 5 && st < 7) {
+      for (const target of glowTargets) {
+        target.material.color.copy(target.highlightColor)
+        for (const g of target.glows) {
+          g.mesh.visible = true
+        }
+      }
+      const puls = Math.sin(elapsed * 2) * 0.5 + 0.5
+      for (const target of glowTargets) {
+        for (const g of target.glows) {
+          g.material.opacity = g.baseOpacity * (0.85 + puls * 0.15)
+          const s = 1 + puls * 0.002
+          g.mesh.scale.set(s, s, s)
+        }
+      }
+      if (st === 5 && subTypingDone && subIdx === 2) {
+        st = 6
+        subHoldUntil = elapsed + 2.0
+      }
+    }
+    // 6: sub3 hold
+    if (st === 6 && elapsed >= subHoldUntil) {
+      subtitleEl.style.transition = 'opacity 0.3s'
+      subtitleEl.style.opacity = '0'
+      st = 7
+      if (!titleStarted) runTitleWriter()
+    }
+    // 7: title typing - glow static
+    if (st === 7) {
+      for (const target of glowTargets) {
+        target.material.color.copy(target.highlightColor)
+        for (const g of target.glows) {
+          g.mesh.visible = true
+          g.material.opacity = g.baseOpacity
+        }
       }
     }
   }
 
-  // phase 3: remaining 80% get color
-  if (elapsed >= PHASE.start[PHASES.ALL_COLOR]) {
-    const p = elapsed < phaseEnd(PHASES.ALL_COLOR) ? progress(elapsed, PHASES.ALL_COLOR) : 1
-    for (const b of allBuildings) {
-      if (b.colorPhase === 3) {
-        b.material.color.copy(b.baseColor).multiplyScalar(p)
-      }
-    }
-  }
-
-  // phase 4: extrusion with staggered random delay
-  if (elapsed >= PHASE.start[PHASES.EXTRUDE]) {
-    for (const b of allBuildings) {
-      const start = PHASE.start[PHASES.EXTRUDE] + b.extrudeDelay
-      const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
-      b.mesh.scale.z = p
-      b.line.scale.z = p
-    }
-    for (const target of glowTargets) {
-      const start = PHASE.start[PHASES.EXTRUDE] + target.extrudeDelay
-      const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
-      for (const g of target.glows) {
-        g.mesh.scale.z = p
-      }
-    }
-  }
-
-  // phase 5: title starts typing
-  if (elapsed >= PHASE.start[PHASES.GLOW] && !titleStarted) {
-    runTitleWriter()
-  }
-
-  // after title completes with delay, reveal target buildings
+  // 1s after title completes, enable bounce/hover/click
   if (titleComplete) {
-    if (revealStartTime === 0) revealStartTime = elapsed
-    const delay = REVEAL_DELAY
-    const t = Math.max(0, elapsed - revealStartTime - delay)
-    const p = Math.min(1, t / REVEAL_DUR)
-    for (const target of glowTargets) {
-      target.mesh.visible = true
-      target.line.visible = true
-      target.material.color.copy(target.baseColor).multiplyScalar(p)
-      target.mesh.scale.z = p
-      target.line.scale.z = p
-      for (const g of target.glows) {
-        g.mesh.visible = true
-        g.material.opacity = g.baseOpacity * p
-      }
+    if (titleEndTime === 0) titleEndTime = elapsed
+    if (elapsed - titleEndTime >= 1.0 && st < 8) {
+      st = 8
+      animDone = true
+      for (const l of labels) l.el.style.opacity = '0.95'
     }
-    for (const l of labels) {
-      l.el.style.opacity = String(0.95 * p)
-    }
-    if (p >= 1 && !animDone) animDone = true
   }
 
   // slide scene left for about section
@@ -394,12 +523,10 @@ function animate() {
     const tx = panelSrc + (panelDst - panelSrc) * et
     aboutPanel.style.transform = 'translateX(' + tx + '%)'
     aboutPanel.style.opacity = String(t)
-    if (t >= 1) {
-      slideDir = 0
-    }
+    if (t >= 1) slideDir = 0
   }
 
-  if (!animDone) {
+  if (st < 8) {
     renderer.render(scene, camera)
     labelRenderer.render(scene, camera)
     return
@@ -420,11 +547,11 @@ function animate() {
     }
 
     if (isHovered) {
-      const c = target.baseColor.clone()
+      const c = target.highlightColor.clone()
       c.lerp(new THREE.Color(0xffffff), 0.4)
       target.material.color.copy(c)
     } else {
-      target.material.color.copy(target.baseColor)
+      target.material.color.copy(target.highlightColor)
     }
   }
 
