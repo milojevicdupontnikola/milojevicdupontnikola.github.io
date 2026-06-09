@@ -338,7 +338,10 @@ function openAbout() {
     l.el.style.opacity = '0'
   }
   aboutPanel.style.opacity = '1'
-  runAboutTypewriter()
+  aboutHeading.innerHTML = ''
+  aboutBody.style.opacity = '0'
+  closeBtn.style.opacity = '0'
+  setTimeout(() => runAboutTypewriter(), 900)
 }
 
 function closeAbout() {
@@ -351,6 +354,176 @@ function closeAbout() {
   }
 }
 
+// --- Info panels (EUBUCCO / DBSM) ---
+
+const infoData = {
+  EUBUCCO: 'EUBUCCO is a scientific database of individual building footprints for 322+ million buildings across the 27 European Union countries, Norway, Switzerland, and the UK. It is composed of 55 open datasets, including government registries (62.2%), OpenStreetMap (17.4%), and Microsoft building footprints (20.4%) that have been collected, harmonized, and validated.',
+  DBSM: 'The EU Digital Building Stock Model (DBSM) provides a detailed and comprehensive and homogeneous geospatial database of individual buildings across the European Union. While primarily focused on energy-related characteristics, the model supports a broad range of applications. DBSM enables bottom-up solutions from individual building level to entire neighborhoods and national scales.',
+}
+
+let infoActive = false
+let infoTarget = null
+let infoLabel = ''
+const infoVec3 = new THREE.Vector3()
+
+const FEATHER = 20
+const infoPanel = document.createElement('div')
+infoPanel.style.cssText = [
+  'position: fixed',
+  'z-index: 30',
+  'width: 33%',
+  'height: 66%',
+  'font-family: monospace',
+  'color: #fff',
+  'pointer-events: none',
+  'opacity: 0',
+  'transition: opacity 0.4s',
+  'background: #000',
+  '-webkit-mask-image: linear-gradient(to right, transparent 0px, black ' + FEATHER + 'px calc(100% - ' + FEATHER + 'px), transparent 100%), linear-gradient(to bottom, transparent 0px, black ' + FEATHER + 'px calc(100% - ' + FEATHER + 'px), transparent 100%)',
+  '-webkit-mask-composite: intersect',
+  'mask-image: linear-gradient(to right, transparent 0px, black ' + FEATHER + 'px calc(100% - ' + FEATHER + 'px), transparent 100%), linear-gradient(to bottom, transparent 0px, black ' + FEATHER + 'px calc(100% - ' + FEATHER + 'px), transparent 100%)',
+  'mask-composite: intersect',
+].join(';') + ';'
+document.body.appendChild(infoPanel)
+
+const infoInner = document.createElement('div')
+infoInner.style.cssText = [
+  'padding: 8% 10% 0 10%',
+  'height: 100%',
+  'overflow-y: auto',
+  'pointer-events: none',
+  'box-sizing: border-box',
+].join(';') + ';'
+infoPanel.appendChild(infoInner)
+
+const infoHeading = document.createElement('h1')
+infoHeading.style.cssText = [
+  'font-size: 20px',
+  'font-weight: 700',
+  'letter-spacing: 3px',
+  'text-transform: uppercase',
+  'margin: 0 0 20px 0',
+  'min-height: 1.4em',
+  'overflow: hidden',
+  'white-space: nowrap',
+].join(';') + ';'
+infoInner.appendChild(infoHeading)
+
+const infoBody = document.createElement('div')
+infoBody.style.cssText = [
+  'font-size: 14px',
+  'line-height: 1.7',
+  'letter-spacing: 0.5px',
+  'opacity: 0',
+].join(';') + ';'
+infoInner.appendChild(infoBody)
+
+const infoCloseBtn = document.createElement('span')
+infoCloseBtn.textContent = '[ close ]'
+infoCloseBtn.style.cssText = [
+  'display: inline-block',
+  'margin-top: 12px',
+  'font-size: 14px',
+  'font-weight: 700',
+  'letter-spacing: 2px',
+  'cursor: pointer',
+  'pointer-events: auto',
+  'opacity: 0',
+  'transition: opacity 0.3s',
+].join(';') + ';'
+infoCloseBtn.addEventListener('mouseenter', () => { infoCloseBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
+infoCloseBtn.addEventListener('mouseleave', () => { infoCloseBtn.style.textShadow = 'none' })
+infoCloseBtn.addEventListener('click', closeInfoPanel)
+infoInner.appendChild(infoCloseBtn)
+
+function openInfoPanel(extra) {
+  if (projectAnimDir !== 0) return
+  if (infoActive) {
+    if (infoTarget === extra) return
+    closeInfoPanel()
+    infoHeading.innerHTML = ''
+    infoHeading.textContent = ''
+    infoBody.innerHTML = ''
+    infoBody.style.opacity = '0'
+    infoCloseBtn.style.opacity = '0'
+    infoPanel.style.opacity = '0'
+  }
+  infoActive = true
+  infoTarget = extra
+  infoLabel = extra.label
+
+  infoHeading.innerHTML = ''
+  infoHeading.textContent = ''
+  infoBody.style.opacity = '0'
+  infoCloseBtn.style.opacity = '0'
+
+  const txt = document.createTextNode('')
+  const cur = makeCursor()
+  infoHeading.appendChild(txt)
+  infoHeading.appendChild(cur)
+  let i = 0
+  const word = extra.label
+  const t = setInterval(() => {
+    txt.textContent = word.substring(0, i + 1)
+    i++
+    if (i >= word.length) {
+      clearInterval(t)
+      infoHeading.removeChild(cur)
+
+      const p = document.createElement('p')
+      p.textContent = infoData[word]
+      p.style.margin = '0 0 0.6em 0'
+      infoBody.innerHTML = ''
+      infoBody.appendChild(p)
+
+      infoBody.style.transition = 'opacity 0.6s'
+      infoBody.style.opacity = '1'
+      infoCloseBtn.style.transition = 'opacity 0.6s'
+      infoCloseBtn.style.opacity = '1'
+    }
+  }, 60)
+
+  infoPanel.style.opacity = '1'
+}
+
+function closeInfoPanel() {
+  if (!infoActive) return
+  infoActive = false
+  infoTarget = null
+  infoPanel.style.opacity = '0'
+}
+
+function updateInfoPanelPosition() {
+  if (!infoActive || !infoTarget) return
+  const pw = window.innerWidth * 0.33
+  const ph = window.innerHeight * 0.66
+  const GAP = 30
+  const BUFFER = 60
+
+  infoVec3.set(infoTarget.centroid.x, infoTarget.height * 0.5, -infoTarget.centroid.z)
+  infoVec3.project(camera)
+  const sx = (infoVec3.x * 0.5 + 0.5) * window.innerWidth
+
+  const projTarget = glowTargets.find(t => t.label === 'Projects')
+  let px = sx
+  if (projTarget) {
+    infoVec3.set(projTarget.centroid.x, projTarget.height * 0.5, -projTarget.centroid.z)
+    infoVec3.project(camera)
+    px = (infoVec3.x * 0.5 + 0.5) * window.innerWidth
+  }
+
+  const anchor = Math.max(sx, px) + BUFFER
+  let left = anchor + GAP
+  if (left + pw > window.innerWidth - GAP) {
+    left = Math.min(sx, px) - BUFFER - pw - GAP
+  }
+  infoPanel.style.left = Math.max(GAP, Math.min(left, window.innerWidth - pw - GAP)) + 'px'
+
+  let top = (window.innerHeight - ph) / 2
+  top = Math.max(GAP, Math.min(top, window.innerHeight * 0.74 - ph))
+  infoPanel.style.top = top + 'px'
+}
+
 function openProjectMode() {
   if (projectActive || projectAnimDir !== 0 || aboutActive || slideDir !== 0) return
   projectActive = true
@@ -360,6 +533,7 @@ function openProjectMode() {
   for (const l of labels) l.el.style.opacity = '0'
   for (const l of extraLabels) l.el.style.opacity = '1'
   projHeading.style.opacity = '1'
+  runProjectTypewriter()
 
   const building = glowTargets.find(t => t.label === 'Projects')
   const box = new THREE.Box3().setFromObject(building.mesh)
@@ -388,6 +562,7 @@ function closeProjectMode() {
   projectActive = false
   projectAnimDir = -1
   projectAnimStart = clock.getElapsedTime()
+  if (infoActive) closeInfoPanel()
 
   projCamA.copy(camera.position)
   projLookA.copy(projLookB)
@@ -397,7 +572,26 @@ function closeProjectMode() {
   for (const l of labels) l.el.style.opacity = '0.95'
   for (const l of extraLabels) l.el.style.opacity = '0'
   projHeading.style.opacity = '0'
+  projHeading.innerHTML = ''
   projCloseBtn.style.opacity = '0'
+}
+
+function runProjectTypewriter() {
+  projHeading.innerHTML = ''
+  const txt = document.createTextNode('')
+  const cur = makeCursor()
+  projHeading.appendChild(txt)
+  projHeading.appendChild(cur)
+  let i = 0
+  const word = 'Projects'
+  const t = setInterval(() => {
+    txt.textContent = word.substring(0, i + 1)
+    i++
+    if (i >= word.length) {
+      clearInterval(t)
+      projHeading.removeChild(cur)
+    }
+  }, 60)
 }
 
 // --- Project mode ---
@@ -411,6 +605,7 @@ const projCamB = new THREE.Vector3()
 const projLookA = new THREE.Vector3()
 const projLookB = new THREE.Vector3()
 const extraHovered = new Set()
+let closestExtra = null
 const extraLabels = []
 
 const projCloseBtn = document.createElement('span')
@@ -437,7 +632,6 @@ projCloseBtn.addEventListener('click', closeProjectMode)
 document.body.appendChild(projCloseBtn)
 
 const projHeading = document.createElement('div')
-projHeading.textContent = 'Projects'
 projHeading.style.cssText = [
   'position: fixed',
   'bottom: 18%',
@@ -489,7 +683,10 @@ const allClickMeshes = meshes.concat(extraMeshes)
 let animDone = false
 
 renderer.domElement.addEventListener('pointermove', e => {
-  if (!animDone) return
+  if (!animDone) {
+    renderer.domElement.style.cursor = 'default'
+    return
+  }
   pointer.x = (e.clientX / window.innerWidth) * 2 - 1
   pointer.y = -(e.clientY / window.innerHeight) * 2 + 1
   raycaster.setFromCamera(pointer, camera)
@@ -497,12 +694,18 @@ renderer.domElement.addEventListener('pointermove', e => {
   const hits = raycaster.intersectObjects(allClickMeshes)
   hovered.clear()
   extraHovered.clear()
+  closestExtra = null
   for (const hit of hits) {
     const target = glowTargets.find(t => t.mesh === hit.object)
     if (target) hovered.add(target)
     const extra = projectExtras.find(e => e.mesh === hit.object)
-    if (extra) extraHovered.add(extra)
+    if (extra) {
+      extraHovered.add(extra)
+      if (!closestExtra) closestExtra = extra
+    }
   }
+  renderer.domElement.style.cursor =
+    hovered.size > 0 || (projectActive && extraHovered.size > 0) ? 'pointer' : 'default'
 })
 
 renderer.domElement.addEventListener('click', () => {
@@ -516,8 +719,14 @@ renderer.domElement.addEventListener('click', () => {
       console.log('Clicked:', target.label)
     }
   }
-  for (const extra of extraHovered) {
-    if (projectActive) console.log(extra.label, '- placeholder')
+  if (closestExtra && projectActive) {
+    if (extraHovered.size > 1 && closestExtra === infoTarget) {
+      const other = projectExtras.find(e => e !== closestExtra && extraHovered.has(e))
+      if (other) { closeInfoPanel(); openInfoPanel(other) }
+      else { openInfoPanel(closestExtra) }
+    } else {
+      openInfoPanel(closestExtra)
+    }
   }
 })
 
@@ -674,6 +883,8 @@ function animate() {
     camera.lookAt(look)
     if (t >= 1) projectAnimDir = 0
   }
+
+  updateInfoPanelPosition()
 
   if (st < 8) {
     renderer.render(scene, camera)
