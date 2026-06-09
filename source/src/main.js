@@ -122,6 +122,156 @@ function runTitleWriter() {
   titleTimers.push(t1)
 }
 
+// --- About section ---
+
+const ABOUT_CAM_X = 280
+const SLIDE_DUR = 1.2
+let aboutActive = false
+let slideStartTime = 0
+let slideDir = 0 // 1 = entering about, -1 = exiting, 0 = idle
+let aboutTypingDone = false
+
+function easeInOutQuad(t) {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+}
+
+const aboutPanel = document.createElement('div')
+aboutPanel.id = 'about-panel'
+aboutPanel.style.cssText = [
+  'position: fixed',
+  'right: 0',
+  'top: 0',
+  'width: 44%',
+  'height: 100%',
+  'z-index: 25',
+  'font-family: monospace',
+  'color: #fff',
+  'display: flex',
+  'flex-direction: column',
+  'justify-content: center',
+  'pointer-events: none',
+  'opacity: 0',
+  'transform: translateX(100%)',
+  'transition: none',
+].join(';') + ';'
+document.body.appendChild(aboutPanel)
+
+const aboutInner = document.createElement('div')
+aboutInner.style.cssText = [
+  'padding: 10% 8%',
+  'max-height: 80%',
+  'overflow-y: auto',
+  'pointer-events: auto',
+].join(';') + ';'
+aboutPanel.appendChild(aboutInner)
+
+const aboutHeading = document.createElement('h1')
+aboutHeading.style.cssText = [
+  'font-size: 20px',
+  'font-weight: 700',
+  'letter-spacing: 3px',
+  'text-transform: uppercase',
+  'margin: 0 0 28px 0',
+  'min-height: 1.4em',
+  'overflow: hidden',
+  'white-space: nowrap',
+].join(';') + ';'
+aboutInner.appendChild(aboutHeading)
+
+const aboutBody = document.createElement('div')
+aboutBody.style.cssText = [
+  'font-size: 14px',
+  'line-height: 1.7',
+  'letter-spacing: 0.5px',
+  'opacity: 0',
+  'white-space: pre-wrap',
+].join(';') + ';'
+aboutBody.textContent = [
+  'I am a freelancer based in Berlin, Germany.',
+  '',
+  'I am available for missions in the space of AI, geospatial data, climate change, urban planning \u2013 or an intersection of these topics.',
+  '',
+  'My expertise includes:',
+  '',
+  '\u2022 Data science project implementation',
+  '\u2022 Consulting, management, or auditing of AI for Climate projects',
+  '\u2022 Development and delivery of education programs',
+  '______________________________________________',
+  '',
+  'My work has broadly investigated the pathway from research to deployment of AI systems for climate action in cities, focusing on narratives, data needs, tool development, and practical deployment considerations. I have particular expertise in geospatial data science, gained, for example, from leading the development of the EUBUCCO building stock dataset (eubucco.com).',
+  '',
+  'I hold a PhD from the Technical University Berlin and wrote my doctoral dissertation on \u201CGeospatial artificial intelligence for scaling low-carbon planning\u201D under the supervision of Felix Creutzig. I worked for 7 years in Felix Creutzig\u2019s lab at MCC Berlin, now part of the renowned Potsdam Institute for Climate Impact Research (PIK).',
+  '',
+  'I am also a founding member of Climate Change AI (CCAI), a global non-profit aiming to catalyze impactful work at the intersection of climate change and machine learning, where I have taken on various roles, including chairing the organization\u2019s educational content committee and being a member of its board of directors.',
+].join('\n\n')
+aboutInner.appendChild(aboutBody)
+
+const closeBtn = document.createElement('span')
+closeBtn.textContent = '[ close ]'
+closeBtn.style.cssText = [
+  'display: inline-block',
+  'margin-top: 32px',
+  'font-size: 14px',
+  'font-weight: 700',
+  'letter-spacing: 2px',
+  'cursor: pointer',
+  'pointer-events: auto',
+  'opacity: 0',
+  'transition: opacity 0.3s',
+].join(';') + ';'
+closeBtn.addEventListener('mouseenter', () => { closeBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
+closeBtn.addEventListener('mouseleave', () => { closeBtn.style.textShadow = 'none' })
+aboutInner.appendChild(closeBtn)
+
+closeBtn.addEventListener('click', closeAbout)
+
+function runAboutTypewriter() {
+  aboutHeading.textContent = ''
+  aboutBody.style.opacity = '0'
+  closeBtn.style.opacity = '0'
+  aboutTypingDone = false
+  let i = 0
+  const word = 'About'
+  const t = setInterval(() => {
+    aboutHeading.textContent += word[i]
+    i++
+    if (i >= word.length) {
+      clearInterval(t)
+      aboutTypingDone = true
+      aboutBody.style.transition = 'opacity 0.6s'
+      aboutBody.style.opacity = '1'
+      closeBtn.style.transition = 'opacity 0.6s'
+      closeBtn.style.opacity = '1'
+    }
+  }, 35)
+}
+
+function openAbout() {
+  if (aboutActive || slideDir !== 0) return
+  aboutActive = true
+  slideDir = 1
+  slideStartTime = clock.getElapsedTime()
+  titleLine1.style.opacity = '0'
+  titleLine2Div.style.opacity = '0'
+  for (const l of labels) {
+    l.el.style.opacity = '0'
+  }
+  aboutPanel.style.opacity = '1'
+  runAboutTypewriter()
+}
+
+function closeAbout() {
+  if (!aboutActive || slideDir !== 0) return
+  aboutActive = false
+  slideDir = -1
+  slideStartTime = clock.getElapsedTime()
+  titleLine1.style.opacity = '1'
+  titleLine2Div.style.opacity = '1'
+  for (const l of labels) {
+    l.el.style.opacity = '0.95'
+  }
+}
+
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
 const hovered = new Set()
@@ -145,7 +295,11 @@ renderer.domElement.addEventListener('pointermove', e => {
 renderer.domElement.addEventListener('click', () => {
   if (!animDone) return
   for (const target of hovered) {
-    console.log('Clicked:', target.label, target.mesh.position)
+    if (target.label === 'About') {
+      openAbout()
+    } else {
+      console.log('Clicked:', target.label, target.mesh.position)
+    }
   }
 })
 
@@ -229,6 +383,24 @@ function animate() {
       l.el.style.opacity = String(0.95 * p)
     }
     if (p >= 1 && !animDone) animDone = true
+  }
+
+  // camera slide for about section
+  if (slideDir !== 0) {
+    const t = Math.min(1, (elapsed - slideStartTime) / SLIDE_DUR)
+    const et = easeInOutQuad(t)
+    const srcX = slideDir === 1 ? 0 : ABOUT_CAM_X
+    const dstX = slideDir === 1 ? ABOUT_CAM_X : 0
+    camera.position.x = srcX + (dstX - srcX) * et
+    camera.lookAt(0, 0, 0)
+    const panelSrc = slideDir === 1 ? 100 : 0
+    const panelDst = slideDir === 1 ? 0 : 100
+    const tx = panelSrc + (panelDst - panelSrc) * et
+    aboutPanel.style.transform = 'translateX(' + tx + '%)'
+    aboutPanel.style.opacity = String(t)
+    if (t >= 1) {
+      slideDir = 0
+    }
   }
 
   if (!animDone) {
