@@ -49,7 +49,7 @@ function phaseEnd(i) { return PHASE.start[i] + PHASE.dur[i] }
 const container = new THREE.Group()
 scene.add(container)
 
-const { group, glowTargets, allBuildings } = await loadBuildings()
+const { group, glowTargets, allBuildings, projectExtras } = await loadBuildings()
 container.add(group)
 
 const labels = []
@@ -80,7 +80,7 @@ for (const target of glowTargets) {
 }
 
 const TITLE_LINE1 = 'Nikola Milojevic-Dupont \u2013 Scientific Consulting'
-const TITLE_LINE2 = 'Geospatial Data + AI  ->  Climate + Cities'
+const TITLE_LINE2 = 'Geospatial Data + AI  \u2192  Climate + Cities'
 
 const TITLE_CLASS = 'position: fixed; left: 50%; transform: translateX(-50%); z-index: 20; text-align: center; font-family: monospace; color: #fff; opacity: 0; pointer-events: none;'
 const LINE_CLASS = 'font-size: 24px; font-weight: 700; letter-spacing: 2px; white-space: nowrap; overflow: hidden; min-height: 1.4em;'
@@ -94,9 +94,9 @@ titleLine2Div.style.cssText = TITLE_CLASS + ' bottom: 3%; ' + LINE_CLASS
 document.body.appendChild(titleLine2Div)
 
 const SUBTITLES = [
-  'Where sensing our environment produced digital representation...',
+  'Where sensing our environment produced digital representations...',
   '...using AI to enhance sense-making capabilities...',
-  '...to tackle socio-environmental challenges.',
+  '...to target action on socio-environmental challenges.',
 ]
 const subtitleEl = document.createElement('div')
 subtitleEl.style.cssText = [
@@ -330,7 +330,7 @@ function runAboutTypewriter() {
 }
 
 function openAbout() {
-  if (aboutActive || slideDir !== 0) return
+  if (aboutActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   aboutActive = true
   slideDir = 1
   slideStartTime = clock.getElapsedTime()
@@ -351,10 +351,141 @@ function closeAbout() {
   }
 }
 
+function openProjectMode() {
+  if (projectActive || projectAnimDir !== 0 || aboutActive || slideDir !== 0) return
+  projectActive = true
+  projectAnimDir = 1
+  projectAnimStart = clock.getElapsedTime()
+
+  for (const l of labels) l.el.style.opacity = '0'
+  for (const l of extraLabels) l.el.style.opacity = '1'
+  projHeading.style.opacity = '1'
+
+  const building = glowTargets.find(t => t.label === 'Projects')
+  const box = new THREE.Box3().setFromObject(building.mesh)
+  for (const extra of projectExtras) {
+    box.expandByObject(extra.mesh)
+  }
+  const center = box.getCenter(new THREE.Vector3())
+  const size = box.getSize(new THREE.Vector3())
+  const width = Math.max(size.x, size.z)
+  const aspect = window.innerWidth / window.innerHeight
+  const vFov = 45 * Math.PI / 180
+  const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect)
+  const d = (width * 1.4) / (2 * Math.tan(hFov / 2))
+
+  projCamA.copy(camera.position)
+  projLookA.set(0, 0, 0)
+  projLookB.copy(center)
+  const dir = new THREE.Vector3(-200, 320, 450).normalize()
+  projCamB.copy(center).add(dir.multiplyScalar(Math.max(d, 15)))
+
+  projCloseBtn.style.opacity = '1'
+}
+
+function closeProjectMode() {
+  if (!projectActive || projectAnimDir !== 0) return
+  projectActive = false
+  projectAnimDir = -1
+  projectAnimStart = clock.getElapsedTime()
+
+  projCamA.copy(camera.position)
+  projLookA.copy(projLookB)
+  projCamB.set(0, 280, 540)
+  projLookB.set(0, 0, 0)
+
+  for (const l of labels) l.el.style.opacity = '0.95'
+  for (const l of extraLabels) l.el.style.opacity = '0'
+  projHeading.style.opacity = '0'
+  projCloseBtn.style.opacity = '0'
+}
+
+// --- Project mode ---
+
+const PROJ_DUR = 1.0
+let projectActive = false
+let projectAnimDir = 0 // 1=entering, -1=exiting
+let projectAnimStart = 0
+const projCamA = new THREE.Vector3()
+const projCamB = new THREE.Vector3()
+const projLookA = new THREE.Vector3()
+const projLookB = new THREE.Vector3()
+const extraHovered = new Set()
+const extraLabels = []
+
+const projCloseBtn = document.createElement('span')
+projCloseBtn.textContent = '[ close ]'
+projCloseBtn.style.cssText = [
+  'position: fixed',
+  'bottom: 10%',
+  'left: 50%',
+  'transform: translateX(-50%)',
+  'z-index: 30',
+  'font-family: monospace',
+  'color: #fff',
+  'font-size: 14px',
+  'font-weight: 700',
+  'letter-spacing: 2px',
+  'cursor: pointer',
+  'opacity: 0',
+  'transition: opacity 0.3s',
+  'pointer-events: auto',
+].join(';') + ';'
+projCloseBtn.addEventListener('mouseenter', () => { projCloseBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
+projCloseBtn.addEventListener('mouseleave', () => { projCloseBtn.style.textShadow = 'none' })
+projCloseBtn.addEventListener('click', closeProjectMode)
+document.body.appendChild(projCloseBtn)
+
+const projHeading = document.createElement('div')
+projHeading.textContent = 'Projects'
+projHeading.style.cssText = [
+  'position: fixed',
+  'bottom: 18%',
+  'left: 50%',
+  'transform: translateX(-50%)',
+  'z-index: 30',
+  'font-family: monospace',
+  'color: #fff',
+  'font-size: 20px',
+  'font-weight: 700',
+  'letter-spacing: 3px',
+  'text-transform: uppercase',
+  'opacity: 0',
+  'transition: opacity 0.3s',
+  'pointer-events: none',
+].join(';') + ';'
+document.body.appendChild(projHeading)
+
+for (const extra of projectExtras) {
+  const el = document.createElement('div')
+  el.textContent = extra.label
+  el.style.color = '#fff'
+  el.style.fontFamily = 'monospace'
+  el.style.fontSize = '16px'
+  el.style.fontWeight = '900'
+  el.style.webkitTextStroke = '2.5px #000'
+  el.style.paintOrder = 'stroke fill'
+  el.style.textShadow = '0 0 20px rgba(0, 0, 0, 0.8)'
+  el.style.letterSpacing = '3px'
+  el.style.textTransform = 'uppercase'
+  el.style.opacity = '0'
+  el.style.pointerEvents = 'none'
+
+  const yOff = extra.height + 2
+  const lx = extra.centroid.x
+  const lz = -extra.centroid.z
+  const label = new CSS2DObject(el)
+  label.position.set(lx, yOff, lz)
+  container.add(label)
+  extraLabels.push({ label, extra, el, baseY: yOff })
+}
+
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
 const hovered = new Set()
 const meshes = glowTargets.map(t => t.mesh)
+const extraMeshes = projectExtras.map(e => e.mesh)
+const allClickMeshes = meshes.concat(extraMeshes)
 let animDone = false
 
 renderer.domElement.addEventListener('pointermove', e => {
@@ -363,22 +494,30 @@ renderer.domElement.addEventListener('pointermove', e => {
   pointer.y = -(e.clientY / window.innerHeight) * 2 + 1
   raycaster.setFromCamera(pointer, camera)
 
-  const hits = raycaster.intersectObjects(meshes)
+  const hits = raycaster.intersectObjects(allClickMeshes)
   hovered.clear()
+  extraHovered.clear()
   for (const hit of hits) {
     const target = glowTargets.find(t => t.mesh === hit.object)
     if (target) hovered.add(target)
+    const extra = projectExtras.find(e => e.mesh === hit.object)
+    if (extra) extraHovered.add(extra)
   }
 })
 
 renderer.domElement.addEventListener('click', () => {
-  if (!animDone) return
+  if (!animDone || projectAnimDir !== 0 || aboutActive) return
   for (const target of hovered) {
     if (target.label === 'About') {
       openAbout()
+    } else if (target.label === 'Projects') {
+      if (!projectActive) openProjectMode()
     } else {
-      console.log('Clicked:', target.label, target.mesh.position)
+      console.log('Clicked:', target.label)
     }
+  }
+  for (const extra of extraHovered) {
+    if (projectActive) console.log(extra.label, '- placeholder')
   }
 })
 
@@ -526,6 +665,16 @@ function animate() {
     if (t >= 1) slideDir = 0
   }
 
+  // project mode camera zoom
+  if (projectAnimDir !== 0) {
+    const t = Math.min(1, (elapsed - projectAnimStart) / PROJ_DUR)
+    const et = easeInOutQuad(t)
+    camera.position.lerpVectors(projCamA, projCamB, et)
+    const look = new THREE.Vector3().lerpVectors(projLookA, projLookB, et)
+    camera.lookAt(look)
+    if (t >= 1) projectAnimDir = 0
+  }
+
   if (st < 8) {
     renderer.render(scene, camera)
     labelRenderer.render(scene, camera)
@@ -553,6 +702,32 @@ function animate() {
     } else {
       target.material.color.copy(target.highlightColor)
     }
+  }
+
+  // project extras glow + hover (only during project mode)
+  if (projectActive) {
+    for (const extra of projectExtras) {
+      const isHovered = extraHovered.has(extra)
+      const boost = isHovered ? 1.8 : 1
+      const intensity = 0.85 + t * 0.15 * boost
+      for (const g of extra.glows) {
+        g.mesh.visible = true
+        g.material.opacity = g.baseOpacity * intensity
+        const s = 1 + t * 0.002 * boost
+        g.mesh.scale.set(s, s, s)
+      }
+      if (isHovered) {
+        const c = extra.highlightColor.clone()
+        c.lerp(new THREE.Color(0xffffff), 0.4)
+        extra.material.color.copy(c)
+      } else {
+        extra.material.color.copy(extra.highlightColor)
+      }
+    }
+  }
+  // extra labels bounce
+  for (const l of extraLabels) {
+    l.label.position.y = l.baseY + Math.sin(elapsed * 1.5) * 2
   }
 
   for (const l of labels) {

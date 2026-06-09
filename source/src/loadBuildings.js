@@ -96,6 +96,7 @@ export async function loadBuildings() {
   const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 })
   const allBuildings = []
   const glowTargets = []
+  const projectExtras = []
 
   for (const feature of features) {
     const geo = feature.geometry
@@ -120,12 +121,19 @@ export async function loadBuildings() {
       feature.properties.id === 'NL32B_N326E397_Y2596.6553_X3343.2809' ||
       feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630'
 
+    const PROJECT_EXTRA_IDS = {
+      'NL32B_N326E397_Y2442.3019_X3430.7208': 'EUBUCCO',
+      'NL32B_N326E397_Y2450.6257_X3407.2096': 'DBSM',
+    }
+    const isExtra = feature.properties.id in PROJECT_EXTRA_IDS
+    const needsHighlight = isTarget || isExtra
+
     const color = yearColor(t)
     const normalColor = color.clone()
     adjustSaturation(normalColor, 0.75)
 
     let highlightColor
-    if (isTarget) {
+    if (needsHighlight) {
       highlightColor = color.clone()
       adjustSaturation(highlightColor, 1.8)
     }
@@ -168,7 +176,16 @@ export async function loadBuildings() {
       const centroid = polygonCentroid(exterior)
       glowTargets.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label: isBlue ? 'Projects' : 'About', extrudeDelay })
     }
+
+    if (isExtra) {
+      const label = PROJECT_EXTRA_IDS[feature.properties.id]
+      const glowColor = label === 'EUBUCCO' ? 0x44dd88 : 0x8844dd
+      const glows = addGlow(group, geom, mesh.position, glowColor)
+      for (const g of glows) g.mesh.visible = false
+      const centroid = polygonCentroid(exterior)
+      projectExtras.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label, extrudeDelay })
+    }
   }
 
-  return { group, glowTargets, allBuildings }
+  return { group, glowTargets, allBuildings, projectExtras }
 }
