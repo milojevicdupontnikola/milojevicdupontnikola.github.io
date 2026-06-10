@@ -371,7 +371,7 @@ const infoPanel = document.createElement('div')
 infoPanel.style.cssText = [
   'position: fixed',
   'z-index: 30',
-  'width: 33%',
+  'width: 43%',
   'height: 66%',
   'font-family: monospace',
   'color: #fff',
@@ -495,7 +495,7 @@ function closeInfoPanel() {
 
 function updateInfoPanelPosition() {
   if (!infoActive || !infoTarget) return
-  const pw = window.innerWidth * 0.33
+  const pw = window.innerWidth * 0.43
   const ph = window.innerHeight * 0.66
   const GAP = 30
   const BUFFER = 60
