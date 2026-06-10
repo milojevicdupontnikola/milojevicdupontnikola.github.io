@@ -120,7 +120,8 @@ export async function loadBuildings() {
     const isTarget =
       feature.properties.id === 'NL32B_N326E397_Y2596.6553_X3343.2809' ||
       feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630' ||
-      feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638'
+      feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638' ||
+      feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111'
 
     const PROJECT_EXTRA_IDS = {
       'NL32B_N326E397_Y2442.3019_X3430.7208': 'EUBUCCO',
@@ -132,11 +133,17 @@ export async function loadBuildings() {
     const color = yearColor(t)
     const normalColor = color.clone()
     adjustSaturation(normalColor, 0.75)
+    if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
+      normalColor.setHex(0x555555)
+    }
 
     let highlightColor
     if (needsHighlight) {
       highlightColor = color.clone()
       adjustSaturation(highlightColor, 1.8)
+      if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
+        highlightColor.setHex(0x555555)
+      }
     }
 
     const fillMat = new THREE.MeshBasicMaterial({
@@ -180,6 +187,9 @@ export async function loadBuildings() {
         const hsl = {}
         glowColor.getHSL(hsl)
         glowColor.setHSL(hsl.h, hsl.s, Math.min(1, hsl.l * 1.3))
+      } else if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
+        label = 'THEMES'
+        glowColor = 0x555555
       } else {
         label = 'About'
         glowColor = 0xff8800
@@ -191,6 +201,12 @@ export async function loadBuildings() {
       if (label === 'Contact') {
         for (const g of glows) {
           g.baseOpacity *= 1.5
+          g.material.opacity = g.baseOpacity
+        }
+      }
+      if (label === 'THEMES') {
+        for (const g of glows) {
+          g.baseOpacity *= 1.4
           g.material.opacity = g.baseOpacity
         }
       }
