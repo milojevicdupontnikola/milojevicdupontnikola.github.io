@@ -163,12 +163,13 @@ function runTitleWriter() {
         } else {
           html += soFar
         }
-        html += '<span style="animation:cur-blink 0.8s step-end infinite">\u2588</span>'
+        const cursorHtml = '<span style="animation:cur-blink 0.8s step-end infinite">\u2588</span>'
+        html += cursorHtml
         titleLine2Div.innerHTML = html
         j++
         if (j >= TITLE_LINE2.length) {
           clearInterval(t2)
-          titleLine2Div.innerHTML = html.replace(' style="animation:cur-blink 0.8s step-end infinite"', '')
+          titleLine2Div.innerHTML = html.replace(cursorHtml, '')
           titleComplete = true
         }
       }, 50)
