@@ -96,7 +96,7 @@ document.body.appendChild(titleLine2Div)
 
 const SUBTITLES = [
   'Where sensing our environment produced digital representations...',
-  '...using AI to enhance sense-making capabilities...',
+  '...using AI critically to enhance sense-making capabilities...',
   '...to target action on socio-environmental challenges.',
 ]
 const subtitleEl = document.createElement('div')
