@@ -119,7 +119,8 @@ export async function loadBuildings() {
 
     const isTarget =
       feature.properties.id === 'NL32B_N326E397_Y2596.6553_X3343.2809' ||
-      feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630'
+      feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630' ||
+      feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638'
 
     const PROJECT_EXTRA_IDS = {
       'NL32B_N326E397_Y2442.3019_X3430.7208': 'EUBUCCO',
@@ -168,13 +169,33 @@ export async function loadBuildings() {
     allBuildings.push({ mesh, line, material: fillMat, baseColor: normalColor, height, extrudeDelay, colorPhase })
 
     if (isTarget) {
-      const isBlue = feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630'
-      const glows = addGlow(group, geom, mesh.position, isBlue ? 0x6688ff : 0xff8800)
+      let label, glowColor
+      if (feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630') {
+        label = 'Projects'
+        glowColor = 0x6688ff
+      } else if (feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638') {
+        label = 'Contact'
+        glowColor = highlightColor.clone()
+        adjustSaturation(glowColor, 3.0)
+        const hsl = {}
+        glowColor.getHSL(hsl)
+        glowColor.setHSL(hsl.h, hsl.s, Math.min(1, hsl.l * 1.3))
+      } else {
+        label = 'About'
+        glowColor = 0xff8800
+      }
+      const glows = addGlow(group, geom, mesh.position, glowColor)
       for (const g of glows) {
         g.mesh.visible = false
       }
+      if (label === 'Contact') {
+        for (const g of glows) {
+          g.baseOpacity *= 1.5
+          g.material.opacity = g.baseOpacity
+        }
+      }
       const centroid = polygonCentroid(exterior)
-      glowTargets.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label: isBlue ? 'Projects' : 'About', extrudeDelay })
+      glowTargets.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label, extrudeDelay })
     }
 
     if (isExtra) {

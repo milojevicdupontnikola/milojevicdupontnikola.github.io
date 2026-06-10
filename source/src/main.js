@@ -214,9 +214,14 @@ function startSubtitle(idx) {
 const SLIDE_X = 200
 const SLIDE_DUR = 1.2
 let aboutActive = false
+let contactActive = false
 let slideStartTime = 0
-let slideDir = 0 // 1 = entering about, -1 = exiting, 0 = idle
+let slideDir = 0 // 1 = entering, -1 = exiting, 0 = idle
+let slideTargetX = 0
+let slidePanel = null
+let slidePanelSign = 1 // +1 for right-side panels, -1 for left-side panels
 let aboutTypingDone = false
+let contactTypingDone = false
 
 function easeInOutQuad(t) {
   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
@@ -337,10 +342,39 @@ function runAboutTypewriter() {
   }, 60)
 }
 
+function runContactTypewriter() {
+  contactBody.style.opacity = '0'
+  contactCloseBtn.style.opacity = '0'
+  contactTypingDone = false
+  contactHeading.innerHTML = ''
+  const txt = document.createTextNode('')
+  const cur = makeCursor()
+  contactHeading.appendChild(txt)
+  contactHeading.appendChild(cur)
+  let i = 0
+  const word = 'Contact'
+  const t = setInterval(() => {
+    txt.textContent = word.substring(0, i + 1)
+    i++
+    if (i >= word.length) {
+      clearInterval(t)
+      contactHeading.removeChild(cur)
+      contactTypingDone = true
+      contactBody.style.transition = 'opacity 0.6s'
+      contactBody.style.opacity = '1'
+      contactCloseBtn.style.transition = 'opacity 0.6s'
+      contactCloseBtn.style.opacity = '1'
+    }
+  }, 60)
+}
+
 function openAbout() {
-  if (aboutActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  if (aboutActive || contactActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   aboutActive = true
   slideDir = 1
+  slideTargetX = -SLIDE_X
+  slidePanel = aboutPanel
+  slidePanelSign = 1
   slideStartTime = clock.getElapsedTime()
   for (const l of labels) {
     l.el.style.opacity = '0'
@@ -355,6 +389,105 @@ function openAbout() {
 function closeAbout() {
   if (!aboutActive || slideDir !== 0) return
   aboutActive = false
+  slideDir = -1
+  slideStartTime = clock.getElapsedTime()
+  for (const l of labels) {
+    l.el.style.opacity = '0.95'
+  }
+}
+
+// --- Contact section ---
+
+const contactPanel = document.createElement('div')
+contactPanel.id = 'contact-panel'
+contactPanel.style.cssText = [
+  'position: fixed',
+  'left: 0',
+  'top: 10%',
+  'width: 44%',
+  'height: 80%',
+  'z-index: 25',
+  'font-family: monospace',
+  'color: #fff',
+  'pointer-events: none',
+  'opacity: 0',
+  'transform: translateX(-100%)',
+  'transition: none',
+].join(';') + ';'
+document.body.appendChild(contactPanel)
+
+const contactInner = document.createElement('div')
+contactInner.style.cssText = [
+  'padding: 4% 8% 0 8%',
+  'height: 100%',
+  'overflow-y: auto',
+  'pointer-events: auto',
+  'box-sizing: border-box',
+].join(';') + ';'
+contactPanel.appendChild(contactInner)
+
+const contactHeading = document.createElement('h1')
+contactHeading.style.cssText = [
+  'font-size: 20px',
+  'font-weight: 700',
+  'letter-spacing: 3px',
+  'text-transform: uppercase',
+  'margin: 0 0 28px 0',
+  'min-height: 1.4em',
+  'overflow: hidden',
+  'white-space: nowrap',
+].join(';') + ';'
+contactInner.appendChild(contactHeading)
+
+const contactBody = document.createElement('div')
+contactBody.style.cssText = [
+  'font-size: 14px',
+  'line-height: 1.7',
+  'letter-spacing: 0.5px',
+  'opacity: 0',
+].join(';') + ';'
+contactBody.textContent = 'milojevic-dupont (at) pm.me'
+contactInner.appendChild(contactBody)
+
+const contactCloseBtn = document.createElement('span')
+contactCloseBtn.textContent = '[ close ]'
+contactCloseBtn.style.cssText = [
+  'display: inline-block',
+  'margin-top: 24px',
+  'font-size: 14px',
+  'font-weight: 700',
+  'letter-spacing: 2px',
+  'cursor: pointer',
+  'pointer-events: auto',
+  'opacity: 0',
+  'transition: opacity 0.3s',
+].join(';') + ';'
+contactCloseBtn.addEventListener('mouseenter', () => { contactCloseBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
+contactCloseBtn.addEventListener('mouseleave', () => { contactCloseBtn.style.textShadow = 'none' })
+contactCloseBtn.addEventListener('click', closeContact)
+contactInner.appendChild(contactCloseBtn)
+
+function openContact() {
+  if (contactActive || aboutActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  contactActive = true
+  slideDir = 1
+  slideTargetX = SLIDE_X
+  slidePanel = contactPanel
+  slidePanelSign = -1
+  slideStartTime = clock.getElapsedTime()
+  for (const l of labels) {
+    l.el.style.opacity = '0'
+  }
+  contactPanel.style.opacity = '1'
+  contactHeading.innerHTML = ''
+  contactBody.style.opacity = '0'
+  contactCloseBtn.style.opacity = '0'
+  setTimeout(() => runContactTypewriter(), 900)
+}
+
+function closeContact() {
+  if (!contactActive || slideDir !== 0) return
+  contactActive = false
   slideDir = -1
   slideStartTime = clock.getElapsedTime()
   for (const l of labels) {
@@ -533,7 +666,7 @@ function updateInfoPanelPosition() {
 }
 
 function openProjectMode() {
-  if (projectActive || projectAnimDir !== 0 || aboutActive || slideDir !== 0) return
+  if (projectActive || projectAnimDir !== 0 || aboutActive || contactActive || slideDir !== 0) return
   projectActive = true
   projectAnimDir = 1
   projectAnimStart = clock.getElapsedTime()
@@ -717,12 +850,14 @@ renderer.domElement.addEventListener('pointermove', e => {
 })
 
 renderer.domElement.addEventListener('click', () => {
-  if (!animDone || projectAnimDir !== 0 || aboutActive) return
+  if (!animDone || projectAnimDir !== 0 || aboutActive || contactActive) return
   for (const target of hovered) {
     if (target.label === 'About') {
       openAbout()
     } else if (target.label === 'Projects') {
       if (!projectActive) openProjectMode()
+    } else if (target.label === 'Contact') {
+      openContact()
     } else {
       console.log('Clicked:', target.label)
     }
@@ -867,18 +1002,18 @@ function animate() {
     }
   }
 
-  // slide scene left for about section
+  // slide scene for about/contact panels
   if (slideDir !== 0) {
     const t = Math.min(1, (elapsed - slideStartTime) / SLIDE_DUR)
     const et = easeInOutQuad(t)
-    const srcX = slideDir === 1 ? 0 : -SLIDE_X
-    const dstX = slideDir === 1 ? -SLIDE_X : 0
+    const srcX = slideDir === 1 ? 0 : slideTargetX
+    const dstX = slideDir === 1 ? slideTargetX : 0
     container.position.x = srcX + (dstX - srcX) * et
-    const panelSrc = slideDir === 1 ? 100 : 0
-    const panelDst = slideDir === 1 ? 0 : 100
+    const panelSrc = slideDir === 1 ? slidePanelSign * 100 : 0
+    const panelDst = slideDir === 1 ? 0 : slidePanelSign * 100
     const tx = panelSrc + (panelDst - panelSrc) * et
-    aboutPanel.style.transform = 'translateX(' + tx + '%)'
-    aboutPanel.style.opacity = String(t)
+    slidePanel.style.transform = 'translateX(' + tx + '%)'
+    slidePanel.style.opacity = String(t)
     if (t >= 1) slideDir = 0
   }
 
