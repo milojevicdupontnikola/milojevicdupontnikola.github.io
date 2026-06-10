@@ -1,6 +1,6 @@
 # New Website — Landing Page
 
-Full-screen 3D geospatial landing page with 320 extruded Dutch building footprints rendered in Three.js on a black background, with an animated intro sequence and typewriter title overlay.
+Full-screen 3D geospatial landing page with 320 extruded Dutch building footprints rendered in Three.js on a black background, with an animated intro sequence, typewriter subtitle/title overlays, and interactive About/Projects/Info panels.
 
 **Status**: live on GitHub Pages at `https://milojevicdupontnikola.github.io/`, served from the `new-website` branch.
 
@@ -9,12 +9,13 @@ Full-screen 3D geospatial landing page with 320 extruded Dutch building footprin
 ```
 milojevicdupontnikola.github.io/
 ├── index.html                      # Entry point, loads assets/index.js
-├── assets/index.js                 # Built Three.js bundle (~505KB)
+├── assets/index.js                 # Built Three.js bundle (~520KB)
 ├── footprints_centered.geojson     # 320 building footprints (EPSG:3035, centered)
 ├── .nojekyll                       # Disables Jekyll on GitHub Pages
 ├── AGENTS.md                       # This file — project context
+├── google22f79760268f6855.html     # Google Search Console verification (master)
 ├── source/                         # Vite dev project (all source files)
-│   ├── src/main.js                 # Scene, camera, animation, labels, hover/click
+│   ├── src/main.js                 # Scene, camera, animation, labels, hover/click, panels
 │   ├── src/loadBuildings.js        # GeoJSON fetch, extrusion, glow, colors
 │   ├── index.html                  # Dev entry point (loads /src/main.js)
 │   ├── vite.config.js              # Vite config (esnext target, stable filename)
@@ -29,150 +30,154 @@ milojevicdupontnikola.github.io/
 The website runs on the **`new-website`** branch. The `master` branch contains the old Jekyll site and is unused.
 
 ```sh
-git checkout new-website   # switch to the active branch
+git checkout new-website
 ```
 
-## Build & Deploy (Full Rebuild)
-
-Run these steps whenever you make changes to source files:
+## Build & Deploy
 
 ```sh
-# 1. Go to source directory
 cd source
-
-# 2. Install dependencies (only needed first time or after dep changes)
-npm install
-
-# 3. Build the production bundle
 npm run build
-
-# 4. Copy build outputs to repo root (for GitHub Pages serving)
-cd ..
-cp source/dist/index.html .
-cp source/dist/assets/* assets/
-
-# 5. Clean up temp files (prebuild copies geojson to public/)
-rm -f source/public/footprints_centered.geojson
-rm -rf source/node_modules source/dist
-
-# 6. Verify what changed
-git diff --stat
-
-# 7. Stage, commit, and push
-git add -A
-git commit -m "description of changes"
-git push origin new-website
+cp dist/assets/index.js ../assets/index.js
+cp dist/index.html ../index.html
 ```
 
-The site updates automatically on GitHub Pages after the push.
+The site updates automatically on GitHub Pages after pushing `new-website`.
 
-## Quick Dev Workflow (no deploy)
+## Quick Dev
 
 ```sh
 cd source
-npm install      # if not already installed
-npm run dev      # starts Vite dev server at localhost:5173
+npm install
+npm run dev      # Vite dev server at localhost:5173, auto-reloads on changes
 ```
 
-The dev server auto-reloads on file changes. The geojson file is automatically copied to `public/` via the `predev` script.
+## Intro Animation (Event-Driven State Machine)
 
-## Intro Animation (6 Phases)
+After 2.5s, the animation switches to an event-driven state machine (states 0–8) replacing rigid phase timing for all subsequent transitions.
 
-Total duration ~12s. Phases auto-advance based on clock.
+| # | Phase | Trigger | What happens |
+|---|-------|---------|-------------|
+| 0 | SUB1_TYPING | 2.5s elapsed | First subtitle types at 60ms/char with terminal cursor |
+| 1 | SUB1_HOLD | typing done | 2s hold |
+| 2 | COLOR_FILL | hold done | 20% buildings snap instantly, 80% lerp from black over 1.8s |
+| 3 | EXTRUDE+SUB2 | color done | Buildings extrude 0→1 over 1.5s (staggered 0–0.8s). Second subtitle types. |
+| 4 | SUB2_HOLD | extrude+typing done | 2s hold |
+| 5 | GLOW+SUB3 | hold done | Target buildings: instant highlight color + sine-wave pulsing. Third subtitle types. |
+| 6 | SUB3_HOLD | typing done | 2s hold |
+| 7 | TITLE | hold done | Title typewriter: line 1 at 60ms/char, line 2 at 50ms/char |
+| 8 | DONE | 1s after title done | Labels visible (opacity 0.95), hover/click/bounce enabled |
 
-| # | Name | Start | Duration | What happens |
-|---|------|-------|----------|-------------|
-| 0 | PITCH_BLACK | 0.0s | - | Black screen, nothing visible |
-| 1 | EDGES | 0.8s | 1.5s | White building edges fade in, fill stays black |
-| 2 | SAMPLE_20 | 2.5s | instant | Random 20% of buildings snap to their year color instantly |
-| - | (pause) | 2.5–5.0s | 2.5s | Only 20% colored — dramatic pause |
-| 3 | ALL_COLOR | 5.0s | 1.8s | Remaining 80% transition from black to year color |
-| 4 | EXTRUDE | 7.5s | 1.5s | Buildings grow from flat to full height (staggered random delay per building, 0–0.8s) |
-| 5 | TITLE | 10.0s | - | Title typewriter starts (line 1 at 35ms/char, then line 2 at 30ms/char) |
-| - | REVEAL | after title + 1s | 2.5s | Target buildings fade in with glow + labels after 1s pause following typewriter completion |
-| DONE | - | after reveal | - | Hover/click/bounce activated |
+Extrusion runs only during state 3, never repeats. Glow activation is instant (no 1s lerp) with immediate sine-wave pulsing.
 
-**During animation**: target buildings are completely hidden (`visible = false`) until phase 5.
+## Subtitles
+
+Three-line subtitle sequence types at the top-right (right-aligned, 16px, 60ms/char):
+1. `Where sensing our environment produced digital representations...`
+2. `...using AI critically to enhance sense-making capabilities...`
+3. `...to target action on socio-environmental challenges.`
+
+Each holds for 2s after completing before the next phase.
 
 ## Title Overlay
 
-Appears during phase 5 via typewriter effect (left-to-right character reveal):
+Fixed, centered monospace (24px, bold 700, letter-spacing 2px). Types at 60ms/char (line 1) then 50ms/char (line 2):
 
-- **Top 3%**: `Nikola Milojevic-Dupont – Scientific Consulting` (20px bold, white monospace)
-- **Bottom 3%**: `Geospatial Data + AI -> Climate + Cities` (20px bold, white monospace)
-- Line 1 types at 35ms/char (~1.6s), then line 2 types at 30ms/char (~1.3s) after line 1 finishes
-- **Target buildings only appear after the typewriter fully completes** — 1s pause, then fade in over 2.5s
-- Fixed position, centered, z-index 20 (above 3D canvas)
+- **Top 3%**: `Nikola Milojevic-Dupont – Scientific Consulting`
+- **Bottom 3%**: `Geospatial Data + AI  →  Climate + Cities` (→ renders in Noto Sans Math)
+
+Terminal cursor (blinking █) on all typewriter animations. 1s pause after title complete before enabling labels/bounce/hover/click.
+
+## Target Buildings
+
+| Label | Building ID | Glow Color | Extras |
+|-------|-------------|------------|--------|
+| ABOUT | `NL32B_N326E397_Y2596.6553_X3343.2809` | warm orange `#ff8800` | — |
+| PROJECTS | `NL32B_N326E397_Y2400.9044_X3394.3630` | blue `#6688ff` | — |
+| EUBUCCO | `NL32B_N326E397_Y2442.3019_X3430.7208` | green `#44dd88` | Detected by ID, extra building in project mode |
+| DBSM | `NL32B_N326E397_Y2450.6257_X3407.2096` | purple `#8844dd` | Detected by ID, extra building in project mode |
+
+Target buildings (About + Projects) are hidden until the title typewriter completes + 1s pause. EUBUCCO/DBSM are labelled at 16px (vs 14px for About/Projects), synced lower bounce (`sin(elapsed * 1.5) * 2`).
 
 ## Key Technical Details
 
 - **Node 20**, **Three.js 0.170.0**, **Vite 5.4.21**
-- **Camera**: Perspective 45°, at (0, 280, 540), looking at origin
+- **Camera**: Perspective 45°, default at (0, 280, 540), looking at origin
 - **Buildings**: ExtrudeGeometry with `rotation.x = -PI/2` (maps northing → -Z)
 - **Heights**: top 15% by area get 20–25m, rest get 10–15m (randomized)
 - **Colors**: mapped from year range 1630–2009 via earth-tone ramp (navy → teal → amber)
-- **Saturation**: target buildings 1.8×, others 0.75× (via HSL)
-- **White edges**: shared `LineBasicMaterial` on `EdgesGeometry`, starts at opacity 0, fades in phase 1
-- **Neon glow**: 3 layers per target building, `AdditiveBlending`, scales 1.008/1.02/1.04, pulsing via sine wave
-- **Extrusion animation**: `mesh.scale.z` and `line.scale.z` animate 0→1 (local Z is extrusion axis, maps to world Y after rotation)
-- **ABOUT label**: CSS2DRenderer, 14px uppercase monospace, white fill + 2.5px black stroke, bold 900, letter-spacing 3px
-- **PROJECTS label**: same style, positioned at different 3D centroid
-- **Label bounce**: `sin(elapsed * 1.5 + centroid.x) * 4`
-- **Hover**: raycaster on pointermove, glow intensity ×1.8, fill color lerps 40% toward white
-- **ABOUT click**: camera slides right (x: 0 → 280) over 1.2s (easeInOutQuad), title fades, labels fade, About panel slides in from right. "About" heading typewrites, then body text fades in. `[ close ]` reverses everything.
-- **PROJECTS click**: logs to console (placeholder for future navigation)
+- **Saturation**: targets/extras 1.8× (highlight), others 0.75× (normal), via HSL
+- **White edges**: shared `LineBasicMaterial` on `EdgesGeometry`, fades in at phase 1 (0.8–2.3s)
+- **Neon glow**: 3 layers per glowing building, `AdditiveBlending`, scales 1.008/1.02/1.04, sine-wave pulsing
+- **Extrusion**: `mesh.scale.z` and `line.scale.z` animate 0→1
+- **Container group**: scene slides via `container.position.x` for About mode (not camera position)
+- **Raycaster**: on pointermove after animDone, checks both main targets + project extras
+- **Hover**: glow intensity ×1.8, fill lerps 40% toward white. Canvas cursor set to `pointer`.
+- **About/Projects mode**: mutually exclusive via guards, blocked during transitions
 
-## Target Buildings
+## About Section
 
-| Label | Building ID | Glow Color | Phase |
-|-------|-------------|------------|-------|
-| ABOUT | `NL32B_N326E397_Y2596.6553_X3343.2809` | `#ff8800` (warm orange) | hidden until typewriter finishes, then fade in over 2.5s |
-| PROJECTS | `NL32B_N326E397_Y2400.9044_X3394.3630` | `#6688ff` (blue) | hidden until typewriter finishes, then fade in over 2.5s |
+**Trigger**: Click the ABOUT building after intro completes.
 
-Both are rendered with normal fill + edges like all buildings, but their mesh/line/glow have `visible = false` until the title typewriter completes both lines. Not included in `allBuildings[]` so phases 1–4 don't touch them.
+**Behavior**:
+- Container slides left (x: 0 → -200) over 1.2s easeInOutQuad. Title/labels fade out.
+- About panel (fixed, right 44%, full height, z-index 25) slides in from right
+- 900ms delay, then "About" heading typewrites at 60ms/char with terminal cursor
+- Body text fades in 0.6s after heading finishes. `[ close ]` reverses everything.
+
+**Body content**: 9 paragraphs (14px monospace, line-height 1.7, letter-spacing 0.5px). Bullet points (indices 3–5) bold.
+
+**Styling**: `padding: 4% 8%`, `overflow-y: auto`, close button `margin-top: 6px`.
+
+## Project Mode
+
+**Trigger**: Click the PROJECTS building after intro completes.
+
+**Behavior**:
+- Camera zooms to frame the combined bounding box of Projects + EUBUCCO + DBSM buildings
+- Camera moves to anticlockwise offset `(-200, 320, 450)` normalized, distance = `boxWidth × 1.4 / 2tan(hFov/2)`
+- Elevation ~35°, camera animation over 1s easeInOutQuad
+- "Projects" heading typewrites at 60ms/char with terminal cursor (centered, `bottom: 18%`)
+- `[ close ]` at `bottom: 10%` — reverses camera, resets labels
+
+**EUBUCCO/DBSM panels**: clicking either opens a black info panel (43% × 66%, z-index 30, feather-edged mask). Screen-space position: adjacent to building, flips to left if near right edge, vertically screen-centered. Typewriter heading + fade-in body + `[ close ]`. No overlap with PROJECTS title (clamped to `74vh`). Extra labels hidden outside project mode, shown at `opacity: 1` during.
+
+**Hover/click**: `closestExtra` tracked by raycaster distance. Both extras clickable — cycling supported when both hovered. `openInfoPanel` supports switching (closes current, opens new). Canvas cursor shows pointer on hover.
 
 ## GeoJSON Data
 
-- Source: 320 Dutch building footprints from EUBUCCO
-- Original CRS: EPSG:3035
-- Coordinates centered at origin via `prepare_data.py` (subtracts min x/min y from all coords)
-- Each feature has `id` (string) and `year` (integer 1630–2009) properties
-- Single canonical file at repo root; copied into `source/public/` by `prebuild` script before Vite bundling
-- Also at root for production serving (`/footprints_centered.geojson`)
+- Source: 320 Dutch building footprints from EUBUCCO (EPSG:3035)
+- Coordinates centered at origin via `prepare_data.py`
+- Each feature: `id` (string), `year` (integer 1630–2009)
+- Single canonical file at repo root; copied to `source/public/` by prebuild
 
 ## Build Config
 
-- `vite.config.js`: `build.target: 'esnext'` (supports top-level await), stable output filename via `rollupOptions.output.entryFileNames: 'assets/index.js'`
-- `package.json`: `predev` and `prebuild` scripts copy `../footprints_centered.geojson` to `public/` so Vite serves/bundles it
+- `vite.config.js`: `build.target: 'esnext'`, stable `entryFileNames: 'assets/index.js'`
+- `package.json`: prebuild copies geojson to `public/`
 
-## Animations & CSS2DRenderer Layering
+## Animations & Layering
 
-- Labels use `CSS2DRenderer` with `zIndex: 10` (on top of WebGL canvas)
-- Title overlay uses fixed-position divs with `z-index: 20`
-- About panel uses fixed-position div with `z-index: 25`
-- All are added to `document.body` after the WebGL renderer's canvas
+| Element | Layer |
+|---------|-------|
+| WebGL canvas | base |
+| CSS2D labels | z-index 10 |
+| Title/subtitle overlay | z-index 20 |
+| About panel | z-index 25 |
+| EUBUCCO/DBSM info panels | z-index 30 |
 
-## About Section (Interactive)
+## CSS2DRenderer
 
-**Trigger**: Click the ABOUT building after the intro animation completes.
+- `position: absolute`, `pointer-events: none` on container so clicks pass through to canvas
+- Individual label elements: `pointer-events: none` (rendered as overlay only)
+- Labels use monospace, uppercase, white + 2.5px black stroke, bold 900, letter-spacing 3px
+- Bounce: main labels `sin(elapsed * 1.5 + centroid.x) * 4`; extras `sin(elapsed * 1.5) * 2`
 
-**Behavior**:
-- Camera slides from `(0, 280, 540)` → `(280, 280, 540)` over 1.2s with easeInOutQuad easing. Scene size stays the same — only horizontal position changes.
-- Title overlay and CSS2D labels fade out
-- About panel (fixed, right 44%, full height) slides in from right
-- "About" heading typewrites char-by-char at 35ms/char
-- Body text fades in over 0.6s after heading finishes
-- `[ close ]` button at bottom: reverses the entire process (camera slides back, title/labels reappear, panel slides out)
+## Info Panels (EUBUCCO / DBSM)
 
-**Body content**: Monospace 14px, line-height 1.7, letter-spacing 0.5px, white-space pre-wrap for paragraph breaks.
-
-**Edge cases**:
-- Clicking ABOUT while transition is in progress is blocked (`slideDir !== 0` guard)
-- Clicking `[ close ]` while transitioning is similarly blocked
-- About mode does not affect the post-animation glow/hover/bounce loop (runs in background)
-- PROJECTS building click still logs to console placeholder
-
-**Styling**:
-- Panel: `padding: 10% 8%`, `max-height: 80%`, `overflow-y: auto` for scrollable content
-- Close button: `pointer-events: auto` within panel, hover glow via text-shadow
-- Body text areas: clicking and scrolling work via `pointer-events: auto` on inner container
+- `position: fixed`, black background, `pointer-events: none` on outer (passes through to canvas)
+- Rectangular feather mask: two intersecting linear gradients (top/bottom + left/right), 20px feather
+- Close button: `pointer-events: auto`, hover glow
+- Screen-space position computed each frame via `Vector3.project(camera)`
+- Info data: EUBUCCO (paragraph about the scientific database) and DBSM (paragraph about the Digital Building Stock Model)
+- Panel opens from click handler (guarded by project mode), closes via close button or project mode exit
