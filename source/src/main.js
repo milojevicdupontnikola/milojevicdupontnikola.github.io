@@ -81,6 +81,7 @@ for (const target of glowTargets) {
 
 const TITLE_LINE1 = 'Nikola Milojevic-Dupont \u2013 Scientific Consulting'
 const TITLE_LINE2 = 'Geospatial Data + AI  \u2192  Climate + Cities'
+const ARROW_HTML = '<span style="font-family:\'Noto Sans Math\',serif;display:inline-block;transform:translateY(-0.08em)">\u2192</span>'
 
 const TITLE_CLASS = 'position: fixed; left: 50%; transform: translateX(-50%); z-index: 20; text-align: center; font-family: monospace; color: #fff; opacity: 0; pointer-events: none;'
 const LINE_CLASS = 'font-size: 24px; font-weight: 700; letter-spacing: 2px; white-space: nowrap; overflow: hidden; min-height: 1.4em;'
@@ -149,18 +150,25 @@ function runTitleWriter() {
     if (i >= TITLE_LINE1.length) {
       clearInterval(t1)
       titleLine1.removeChild(cur1)
-      const txt2 = document.createTextNode('')
-      const cur2 = makeCursor()
       titleLine2Div.innerHTML = ''
-      titleLine2Div.appendChild(txt2)
-      titleLine2Div.appendChild(cur2)
       let j = 0
       const t2 = setInterval(() => {
-        txt2.textContent = TITLE_LINE2.substring(0, j + 1)
+        const soFar = TITLE_LINE2.substring(0, j + 1)
+        const ai = soFar.indexOf('\u2192')
+        let html = ''
+        if (ai >= 0) {
+          html += TITLE_LINE2.substring(0, ai)
+          html += ARROW_HTML
+          html += TITLE_LINE2.substring(ai + 1, j + 1)
+        } else {
+          html += soFar
+        }
+        html += '<span style="animation:cur-blink 0.8s step-end infinite">\u2588</span>'
+        titleLine2Div.innerHTML = html
         j++
         if (j >= TITLE_LINE2.length) {
           clearInterval(t2)
-          titleLine2Div.removeChild(cur2)
+          titleLine2Div.innerHTML = html.replace(' style="animation:cur-blink 0.8s step-end infinite"', '')
           titleComplete = true
         }
       }, 50)
