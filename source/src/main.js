@@ -472,7 +472,7 @@ function openContact() {
   if (contactActive || aboutActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   contactActive = true
   slideDir = 1
-  slideTargetX = SLIDE_X
+  slideTargetX = 120
   slidePanel = contactPanel
   slidePanelSign = -1
   slideStartTime = clock.getElapsedTime()
