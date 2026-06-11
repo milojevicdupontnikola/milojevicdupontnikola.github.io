@@ -498,9 +498,13 @@ function closeContact() {
 
 // --- Info panels (EUBUCCO / DBSM) ---
 
+const linkStyle = 'color:#88bbff;text-decoration:underline;pointer-events:auto'
 const infoData = {
   EUBUCCO: 'EUBUCCO is a scientific database of individual building footprints for 322+ million buildings across the 27 European Union countries, Norway, Switzerland, and the UK. It is composed of 55 open datasets, including government registries (62.2%), OpenStreetMap (17.4%), and Microsoft building footprints (20.4%) that have been collected, harmonized, and validated.',
   DBSM: 'The EU Digital Building Stock Model (DBSM) provides a detailed and comprehensive and homogeneous geospatial database of individual buildings across the European Union. While primarily focused on energy-related characteristics, the model supports a broad range of applications. DBSM enables bottom-up solutions from individual building level to entire neighborhoods and national scales.',
+  'AI Climate Institute': 'Preparation, coordination, delivery and curation of an online repository for a 3-day capacity building event in Bel\u00e9m, Brazil, together with the CCAI leadership. Curriculum designed to provide a critical understanding of how AI can be applied ethically, effectively, and in context to mitigate and adapt to the climate crisis.<br><br>Work for CCAI and Open Society Foundation; with support from the COP30 Presidency and Brazilian Ministry of Foreign Affairs, and others.<br><br><a style="' + linkStyle + '" href="https://www.climatechange.ai/events/ai_climate_institute" target="_blank">event</a> \u2022 <a style="' + linkStyle + '" href="https://www.climatechange.ai/events/ai_climate_institute/repository" target="_blank">resource repository</a>',
+  "CCAI's Data Gaps": 'Auditing and consolidation of an online repository aiming to identify and catalog critical data gaps that impede AI/ML applications in addressing climate change, and lay out pathways for filling these gaps.<br><br>Work for CCAI and Google DeepMind.<br><br><a style="' + linkStyle + '" href="https://www.climatechange.ai/dev/datagaps" target="_blank">Learn more</a>',
+  'Academic Research': 'My work has broadly investigated the pathway from research to deployment of AI systems for climate action in cities, focusing on narratives, data needs, tool development, and practical deployment considerations. <a style="' + linkStyle + '" href="https://scholar.google.com/citations?user=49xLPo8AAAAJ&amp;hl=de" target="_blank">Google Scholar</a><br><br>I am co-author of the foundational paper \u201CTackling Climate Change with Machine Learning\u201D that contributed to start the research field of AI for Climate. <a style="' + linkStyle + '" href="https://dl.acm.org/doi/full/10.1145/3485128" target="_blank">ACM</a><br><br>This thesis explores how the increasing availability of geospatial data on cities and artificial intelligence (AI) algorithms used to process them may provide new insights for addressing these urban planning issues. Indeed, available data now allows us to study building stocks, streets, and other urban land uses \u2013 together forming urban form \u2013 at high resolution, but also in a scalable way from neighborhoods to countries. We investigate whether this may help bridge the gap between localized and scalable urban climate solutions... <a style="' + linkStyle + '" href="https://depositonce.tu-berlin.de/items/da94c4cc-c088-4b8d-836e-5cfc37d2c149" target="_blank">PhD thesis</a>',
 }
 
 let infoActive = false
@@ -613,8 +617,9 @@ function openInfoPanel(extra) {
       infoHeading.removeChild(cur)
 
       const p = document.createElement('p')
-      p.textContent = infoData[word]
       p.style.margin = '0 0 0.6em 0'
+      p.style.lineHeight = '1.7'
+      p.innerHTML = infoData[word]
       infoBody.innerHTML = ''
       infoBody.appendChild(p)
 
@@ -794,7 +799,7 @@ document.body.appendChild(projHeading)
 
 for (const extra of projectExtras) {
   const el = document.createElement('div')
-  el.textContent = extra.label
+  el.innerHTML = extra.displayLabel
   el.style.color = '#fff'
   el.style.fontFamily = 'monospace'
   el.style.fontSize = '16px'

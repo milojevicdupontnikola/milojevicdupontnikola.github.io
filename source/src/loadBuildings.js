@@ -159,6 +159,9 @@ export async function loadBuildings() {
     const PROJECT_EXTRA_IDS = {
       'NL32B_N326E397_Y2442.3019_X3430.7208': 'EUBUCCO',
       'NL32B_N326E397_Y2450.6257_X3407.2096': 'DBSM',
+      'NL32B_N326E397_Y2458.2224_X3375.6242': 'AI Climate Institute',
+      'NL32B_N326E397_Y2428.6069_X3491.8848': "CCAI's Data Gaps",
+      'NL32B_N326E397_Y2453.8555_X3347.7617': 'Academic Research',
     }
     const isExtra = feature.properties.id in PROJECT_EXTRA_IDS
     const needsHighlight = isTarget || isExtra
@@ -169,6 +172,9 @@ export async function loadBuildings() {
     if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
       normalColor.setHex(0x555555)
     }
+    if (feature.properties.id === 'NL32B_N326E397_Y2428.6069_X3491.8848') {
+      normalColor.setHex(0x949089)
+    }
 
     let highlightColor
     if (needsHighlight) {
@@ -176,6 +182,9 @@ export async function loadBuildings() {
       adjustSaturation(highlightColor, 1.8)
       if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
         highlightColor.setHex(0x555555)
+      }
+      if (feature.properties.id === 'NL32B_N326E397_Y2428.6069_X3491.8848') {
+        highlightColor.setHex(0x9b9380)
       }
     }
 
@@ -249,15 +258,16 @@ export async function loadBuildings() {
 
     if (isExtra) {
       const label = PROJECT_EXTRA_IDS[feature.properties.id]
-      const glowColor = label === 'EUBUCCO' ? 0x44dd88 : 0x8844dd
+      const glowColor = label === 'EUBUCCO' ? 0x44dd88 : label === 'DBSM' ? 0x8844dd : label === 'AI Climate Institute' ? 0xdd8844 : label === 'Academic Research' ? 0xdd6677 : 0x44aadd
       const glows = addGlow(group, geom, mesh.position, glowColor, 1, [0.15, 0.3, 0.5])
       for (const g of glows) {
         g.mesh.visible = false
         g.baseOpacity *= 2.0
         g.material.opacity = g.baseOpacity
       }
+      const displayLabel = label === 'AI Climate Institute' ? 'AI Climate<br>Institute' : label === "CCAI's Data Gaps" ? "CCAI's<br>Data Gaps" : label === 'Academic Research' ? 'Academic<br>Research' : label
       const centroid = polygonCentroid(exterior)
-      projectExtras.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label, extrudeDelay })
+      projectExtras.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label, displayLabel, extrudeDelay })
     }
   }
 
