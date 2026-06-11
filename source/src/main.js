@@ -725,7 +725,7 @@ function runProjectTypewriter() {
   projHeading.appendChild(txt)
   projHeading.appendChild(cur)
   let i = 0
-  const word = 'Projects'
+  const word = 'Recent Projects'
   const t = setInterval(() => {
     txt.textContent = word.substring(0, i + 1)
     i++
@@ -847,7 +847,7 @@ renderer.domElement.addEventListener('pointermove', e => {
     }
   }
   renderer.domElement.style.cursor =
-    hovered.size > 0 || (projectActive && extraHovered.size > 0) ? 'pointer' : 'default'
+    !projectActive && hovered.size > 0 || projectActive && extraHovered.size > 0 ? 'pointer' : 'default'
 })
 
 renderer.domElement.addEventListener('click', () => {
@@ -1040,7 +1040,7 @@ function animate() {
   const t = Math.sin(elapsed * 2) * 0.5 + 0.5
 
   for (const target of glowTargets) {
-    const isHovered = hovered.has(target)
+    const isHovered = !projectActive && hovered.has(target)
     const boost = isHovered ? 1.8 : 1
     const intensity = 0.85 + t * 0.15 * boost
 
@@ -1071,13 +1071,9 @@ function animate() {
         const s = 1 + t * 0.002 * boost
         g.mesh.scale.set(s, s, s)
       }
-      if (isHovered) {
-        const c = extra.highlightColor.clone()
-        c.lerp(new THREE.Color(0xffffff), 0.4)
-        extra.material.color.copy(c)
-      } else {
-        extra.material.color.copy(extra.highlightColor)
-      }
+      const c = extra.highlightColor.clone()
+      c.lerp(new THREE.Color(0xffffff), isHovered ? 0.4 : 0.2)
+      extra.material.color.copy(c)
     }
   }
   // extra labels bounce
