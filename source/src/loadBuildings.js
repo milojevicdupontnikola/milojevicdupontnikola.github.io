@@ -45,23 +45,56 @@ function adjustSaturation(color, factor) {
   return color.setHSL(hsl.h, hsl.s, hsl.l)
 }
 
-function addGlow(group, geom, pos, color) {
-  const layers = [
-    { scale: 1.008, opacity: 0.2 },
-    { scale: 1.02, opacity: 0.06 },
-    { scale: 1.04, opacity: 0.02 },
+function inflateGeometry(geom, offset) {
+  const g = geom.clone()
+  g.computeVertexNormals()
+  const pos = g.attributes.position
+  const norm = g.attributes.normal
+  for (let i = 0; i < pos.count; i++) {
+    pos.setXYZ(i,
+      pos.getX(i) + norm.getX(i) * offset,
+      pos.getY(i) + norm.getY(i) * offset,
+      pos.getZ(i) + norm.getZ(i) * offset
+    )
+  }
+  pos.needsUpdate = true
+  return g
+}
+
+function addGlow(group, geom, pos, color, scaleFactor = 1, inflationOffsets = null) {
+  const defaultScales = [
+    1 + (1.008 - 1) * scaleFactor,
+    1 + (1.02 - 1) * scaleFactor,
+    1 + (1.04 - 1) * scaleFactor,
   ]
+  const layers = inflationOffsets
+    ? [
+        { offset: inflationOffsets[0], opacity: 0.2 },
+        { offset: inflationOffsets[1], opacity: 0.06 },
+        { offset: inflationOffsets[2], opacity: 0.02 },
+      ]
+    : [
+        { scale: defaultScales[0], opacity: 0.2 },
+        { scale: defaultScales[1], opacity: 0.06 },
+        { scale: defaultScales[2], opacity: 0.02 },
+      ]
 
   const glows = []
   for (const layer of layers) {
-    const g = geom.clone()
-    g.scale(layer.scale, layer.scale, 1)
+    const g = inflationOffsets
+      ? inflateGeometry(geom, layer.offset)
+      : geom.clone()
+    if (!inflationOffsets) g.scale(layer.scale, layer.scale, layer.scale)
     const m = new THREE.MeshBasicMaterial({
       color,
       transparent: true,
       opacity: layer.opacity,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
+      depthTest: true,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
       side: THREE.DoubleSide,
     })
     const mesh = new THREE.Mesh(g, m)
@@ -217,8 +250,12 @@ export async function loadBuildings() {
     if (isExtra) {
       const label = PROJECT_EXTRA_IDS[feature.properties.id]
       const glowColor = label === 'EUBUCCO' ? 0x44dd88 : 0x8844dd
-      const glows = addGlow(group, geom, mesh.position, glowColor)
-      for (const g of glows) g.mesh.visible = false
+      const glows = addGlow(group, geom, mesh.position, glowColor, 1, [0.15, 0.3, 0.5])
+      for (const g of glows) {
+        g.mesh.visible = false
+        g.baseOpacity *= 2.0
+        g.material.opacity = g.baseOpacity
+      }
       const centroid = polygonCentroid(exterior)
       projectExtras.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label, extrudeDelay })
     }
