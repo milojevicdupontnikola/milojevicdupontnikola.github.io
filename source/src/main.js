@@ -189,7 +189,7 @@ function runTitleWriter() {
 }
 
 // animation state machine
-let st = 0 // 0=sub1 typing, 1=sub1 hold, 2=wave, 3=color(skip), 4=extrude+sub2, 5=sub2 hold, 6=glow+sub3, 7=sub3 hold, 8=title, 9=done
+let st = 0 // 0=sub1 typing, 1=sub1 hold, 2=sub2 typing, 3=sub2 hold, 4=wave, 5=extrusion, 6=glow+sub3, 7=sub3 hold, 8=title, 9=done
 let stStart = 0
 
 let subIdx = -1
@@ -1039,9 +1039,22 @@ function animate() {
       subtitleEl.style.opacity = '0'
       st = 2
       stStart = elapsed
+      startSubtitle(1)
     }
-    // 2: wave overlay
-    if (st === 2) {
+    // 2: sub2 typing
+    if (st === 2 && subTypingDone && subIdx === 1) {
+      st = 3
+      subHoldUntil = elapsed + 2.0
+    }
+    // 3: sub2 hold
+    if (st === 3 && elapsed >= subHoldUntil) {
+      subtitleEl.style.transition = 'opacity 0.3s'
+      subtitleEl.style.opacity = '0'
+      st = 4
+      stStart = elapsed
+    }
+    // 4: wave overlay
+    if (st === 4) {
       if (!overlayActive && !overlayDone) {
         startWaveTransition()
       }
@@ -1051,13 +1064,12 @@ function animate() {
         }
         overlayActive = false
         overlayDone = false
-        st = 4
+        st = 5
         stStart = elapsed
-        startSubtitle(1)
       }
     }
-    // 4: extrusion + sub2 typing
-    if (st === 4) {
+    // 5: extrusion
+    if (st === 5) {
       for (const b of allBuildings) {
         const start = stStart + b.extrudeDelay
         const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
@@ -1069,20 +1081,13 @@ function animate() {
         const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
         for (const g of target.glows) g.mesh.scale.z = p
       }
-      if (subTypingDone && subIdx === 1) {
-        st = 5
-        subHoldUntil = elapsed + 2.0
+      if (elapsed - stStart >= 2.5) {
+        st = 6
+        stStart = elapsed
+        startSubtitle(2)
       }
     }
-    // 5: sub2 hold
-    if (st === 5 && elapsed >= subHoldUntil) {
-      subtitleEl.style.transition = 'opacity 0.3s'
-      subtitleEl.style.opacity = '0'
-      st = 6
-      stStart = elapsed
-      startSubtitle(2)
-    }
-    // 6: glow instant + sub3 typing + pulsing
+    // 6: glow + sub3 typing
     if (st >= 6 && st < 8) {
       for (const target of glowTargets) {
         target.material.color.copy(target.highlightColor)
