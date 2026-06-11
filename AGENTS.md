@@ -9,17 +9,18 @@ Full-screen 3D geospatial landing page with 320 extruded Dutch building footprin
 ```
 milojevicdupontnikola.github.io/
 ├── index.html                      # Entry point, loads assets/index.js
-├── assets/index.js                 # Built Three.js bundle (~520KB)
+├── assets/index.js                 # Built Three.js bundle (~603KB)
 ├── footprints_centered.geojson     # 320 building footprints (EPSG:3035, centered)
 ├── .nojekyll                       # Disables Jekyll on GitHub Pages
 ├── AGENTS.md                       # This file — project context
 ├── google22f79760268f6855.html     # Google Search Console verification (master)
 ├── source/                         # Vite dev project (all source files)
-│   ├── src/main.js                 # Scene, camera, animation, labels, hover/click, panels
+│   ├── src/main.js                 # Scene, camera, animation, labels, hover/click, panels, wave overlay
 │   ├── src/loadBuildings.js        # GeoJSON fetch, extrusion, glow, colors
+│   ├── src/waveShader.js           # Vertex + fragment shader for wave overlay (lens distortion bubble)
 │   ├── index.html                  # Dev entry point (loads /src/main.js)
 │   ├── vite.config.js              # Vite config (esnext target, stable filename)
-│   ├── package.json                # prebuild copies geojson to public/ first
+│   ├── package.json                # prebuild copies geojson to public/ first, GSAP dep
 │   ├── public/.gitkeep             # geojson copied here by prebuild during dev
 │   ├── prepare_data.py             # Python script to center GeoJSON coords
 │   └── footprints.geojson          # Raw source data (EPSG:3035, uncentered)
@@ -54,21 +55,30 @@ npm run dev      # Vite dev server at localhost:5173, auto-reloads on changes
 
 ## Intro Animation (Event-Driven State Machine)
 
-After 2.5s, the animation switches to an event-driven state machine (states 0–8) replacing rigid phase timing for all subsequent transitions.
+After 2.5s, the animation switches to an event-driven state machine (states 0–9) replacing rigid phase timing for all subsequent transitions.
 
 | # | Phase | Trigger | What happens |
 |---|-------|---------|-------------|
 | 0 | SUB1_TYPING | 2.5s elapsed | First subtitle types at 60ms/char with terminal cursor |
 | 1 | SUB1_HOLD | typing done | 2s hold |
-| 2 | COLOR_FILL | hold done | 20% buildings snap instantly, 80% lerp from black over 1.8s |
-| 3 | EXTRUDE+SUB2 | color done | Buildings extrude 0→1 over 1.5s (staggered 0–0.8s). Second subtitle types. |
-| 4 | SUB2_HOLD | extrude+typing done | 2s hold |
-| 5 | GLOW+SUB3 | hold done | Target buildings: instant highlight color + sine-wave pulsing. Third subtitle types. |
-| 6 | SUB3_HOLD | typing done | 2s hold |
-| 7 | TITLE | hold done | Title typewriter: line 1 at 60ms/char, line 2 at 50ms/char |
-| 8 | DONE | 1s after title done | Labels visible (opacity 0.95), hover/click/bounce enabled |
+| 2 | SUB2_TYPING | hold done | Second subtitle types (before wave, not during extrusion). |
+| 3 | SUB2_HOLD | typing done | 2s hold |
+| 4 | WAVE | hold done | GSAP-driven wave overlay: buildings start dark, wave bubble expands (1.8s, power4.in ease), revealing colored buildings behind. ShaderMaterial with lens distortion + linearToSRGB(). |
+| 5 | EXTRUDE | wave done | Buildings extrude 0→1 over 1.5s (staggered 0–0.8s). No subtitle. |
+| 6 | GLOW+SUB3 | 2s after extrude starts | Target buildings: instant highlight color + sine-wave pulsing. Third subtitle types. |
+| 7 | SUB3_HOLD | typing done | 2s hold |
+| 8 | TITLE | hold done | Title typewriter: line 1 at 60ms/char, line 2 at 50ms/char |
+| 9 | DONE | 1s after title done | Labels visible (opacity 0.95), hover/click/bounce enabled |
 
-Extrusion runs only during state 3, never repeats. Glow activation is instant (no 1s lerp) with immediate sine-wave pulsing.
+Extrusion runs only during state 5, never repeats. Glow activation is instant (no 1s lerp) with immediate sine-wave pulsing.
+
+### Wave Overlay
+
+- Renders buildings in dark state on overlay render target, then reveals via GSAP-animated bubble (round lens distortion, `radius` 0→1.6, `origin` at screen center)
+- Custom `ShaderMaterial` with `getCoverUV` (fill-screen texture mapping), `getLensDistortion` (UV displacement around origin), and `linearToSRGB()` for correct sRGB output (Three.js r170 doesn't auto-encode custom ShaderMaterial)
+- Render targets sized with `renderer.getDrawingBufferSize()` (physical pixels, not CSS px) to avoid Retina color shift
+- When `overlayActive` is true, only the overlay renders (skips main scene) — avoids blending artifacts
+- Subtitle 2 types and holds (states 2–3) before the wave, so the wave plays during a moment with typewriter on screen
 
 ## Subtitles
 
