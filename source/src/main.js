@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
 import { loadBuildings } from './loadBuildings.js'
+import { gsap } from 'gsap'
+import { vertexShader, fragmentShader } from './waveShader.js'
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x000000)
@@ -28,6 +30,11 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
   labelRenderer.setSize(window.innerWidth, window.innerHeight)
+  if (targetA) targetA.setSize(window.innerWidth, window.innerHeight)
+  if (targetB) targetB.setSize(window.innerWidth, window.innerHeight)
+  if (overlayQuad) {
+    overlayQuad.material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight)
+  }
 })
 
 const PHASES = {
@@ -180,7 +187,7 @@ function runTitleWriter() {
 }
 
 // animation state machine
-let st = 0 // 0=sub1 typing, 1=sub1 hold, 2=color, 3=extrude+sub2, 4=sub2 hold, 5=glow+sub3, 6=sub3 hold, 7=title, 8=done
+let st = 0 // 0=sub1 typing, 1=sub1 hold, 2=wave, 3=color(skip), 4=extrude+sub2, 5=sub2 hold, 6=glow+sub3, 7=sub3 hold, 8=title, 9=done
 let stStart = 0
 
 let subIdx = -1
@@ -208,6 +215,44 @@ function startSubtitle(idx) {
       subTypingDone = true
     }
   }, 60)
+}
+
+function startWaveTransition() {
+  overlayActive = true
+  overlayDone = false
+  for (const b of allBuildings) {
+    b._origColor = b.material.color.clone()
+    if (b.colorPhase === 2) {
+      b.material.color.copy(b.baseColor)
+    } else {
+      b.material.color.set(0x000000)
+    }
+  }
+  renderer.setRenderTarget(targetA)
+  renderer.render(scene, camera)
+  for (const b of allBuildings) {
+    b.material.color.copy(b.baseColor)
+  }
+  renderer.setRenderTarget(targetB)
+  renderer.render(scene, camera)
+  renderer.setRenderTarget(null)
+  for (const b of allBuildings) {
+    b.material.color.copy(b._origColor)
+    delete b._origColor
+  }
+  overlayQuad.material.uniforms.uTexture1.value = targetA.texture
+  overlayQuad.material.uniforms.uTexture2.value = targetB.texture
+  overlayQuad.material.uniforms.uTexture1Size.value.set(targetA.width, targetA.height)
+  overlayQuad.material.uniforms.uTexture2Size.value.set(targetB.width, targetB.height)
+  overlayQuad.material.uniforms.uProgress.value = 0
+  gsap.to(overlayQuad.material.uniforms.uProgress, {
+    value: 1,
+    duration: 2.5,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      overlayDone = true
+    },
+  })
 }
 
 // --- About section ---
@@ -866,13 +911,39 @@ for (const extra of projectExtras) {
   extraLabels.push({ label, extra, el, baseY: yOff })
 }
 
+let animDone = false
+let targetA, targetB, overlayScene, overlayCamera, overlayQuad, overlayActive = false, overlayDone = false
+
+// overlay setup
+targetA = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight)
+targetB = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight)
+overlayScene = new THREE.Scene()
+overlayCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+const overlayMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTexture1: { value: null },
+    uTexture2: { value: null },
+    uProgress: { value: 0 },
+    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uTexture1Size: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uTexture2Size: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+  },
+  vertexShader,
+  fragmentShader,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+  depthTest: false,
+})
+const overlayGeo = new THREE.PlaneGeometry(2, 2)
+overlayQuad = new THREE.Mesh(overlayGeo, overlayMat)
+overlayScene.add(overlayQuad)
+
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
 const hovered = new Set()
 const meshes = glowTargets.map(t => t.mesh)
 const extraMeshes = projectExtras.map(e => e.mesh)
 const allClickMeshes = meshes.concat(extraMeshes)
-let animDone = false
 
 renderer.domElement.addEventListener('pointermove', e => {
   if (!animDone) {
@@ -965,20 +1036,24 @@ function animate() {
       st = 2
       stStart = elapsed
     }
-    // 2: color fill
-    if (st >= 2) {
-      const p = st === 2 ? Math.min(1, (elapsed - stStart) / PHASE.dur[PHASES.ALL_COLOR]) : 1
-      for (const b of allBuildings) {
-        if (b.colorPhase === 3) b.material.color.copy(b.baseColor).multiplyScalar(p)
+    // 2: wave overlay
+    if (st === 2) {
+      if (!overlayActive && !overlayDone) {
+        startWaveTransition()
       }
-      if (st === 2 && p >= 1) {
-        st = 3
+      if (overlayDone) {
+        for (const b of allBuildings) {
+          b.material.color.copy(b.baseColor)
+        }
+        overlayActive = false
+        overlayDone = false
+        st = 4
         stStart = elapsed
         startSubtitle(1)
       }
     }
-    // 3: extrusion + sub2 typing
-    if (st === 3) {
+    // 4: extrusion + sub2 typing
+    if (st === 4) {
       for (const b of allBuildings) {
         const start = stStart + b.extrudeDelay
         const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
@@ -991,20 +1066,20 @@ function animate() {
         for (const g of target.glows) g.mesh.scale.z = p
       }
       if (subTypingDone && subIdx === 1) {
-        st = 4
+        st = 5
         subHoldUntil = elapsed + 2.0
       }
     }
-    // 4: sub2 hold
-    if (st === 4 && elapsed >= subHoldUntil) {
+    // 5: sub2 hold
+    if (st === 5 && elapsed >= subHoldUntil) {
       subtitleEl.style.transition = 'opacity 0.3s'
       subtitleEl.style.opacity = '0'
-      st = 5
+      st = 6
       stStart = elapsed
       startSubtitle(2)
     }
-    // 5: glow instant + sub3 typing + pulsing
-    if (st >= 5 && st < 7) {
+    // 6: glow instant + sub3 typing + pulsing
+    if (st >= 6 && st < 8) {
       for (const target of glowTargets) {
         target.material.color.copy(target.highlightColor)
         for (const g of target.glows) {
@@ -1019,20 +1094,20 @@ function animate() {
           g.mesh.scale.set(s, s, s)
         }
       }
-      if (st === 5 && subTypingDone && subIdx === 2) {
-        st = 6
+      if (st === 6 && subTypingDone && subIdx === 2) {
+        st = 7
         subHoldUntil = elapsed + 2.0
       }
     }
-    // 6: sub3 hold
-    if (st === 6 && elapsed >= subHoldUntil) {
+    // 7: sub3 hold
+    if (st === 7 && elapsed >= subHoldUntil) {
       subtitleEl.style.transition = 'opacity 0.3s'
       subtitleEl.style.opacity = '0'
-      st = 7
+      st = 8
       if (!titleStarted) runTitleWriter()
     }
-    // 7: title typing - glow static
-    if (st === 7) {
+    // 8: title typing - glow static
+    if (st === 8) {
       for (const target of glowTargets) {
         target.material.color.copy(target.highlightColor)
         for (const g of target.glows) {
@@ -1046,8 +1121,8 @@ function animate() {
   // 1s after title completes, enable bounce/hover/click
   if (titleComplete) {
     if (titleEndTime === 0) titleEndTime = elapsed
-    if (elapsed - titleEndTime >= 1.0 && st < 8) {
-      st = 8
+    if (elapsed - titleEndTime >= 1.0 && st < 9) {
+      st = 9
       animDone = true
       for (const l of labels) l.el.style.opacity = '0.95'
     }
@@ -1080,9 +1155,14 @@ function animate() {
 
   updateInfoPanelPosition()
 
-  if (st < 8) {
+  if (st < 9) {
     renderer.render(scene, camera)
     labelRenderer.render(scene, camera)
+    // during wave overlay, render overlay instead
+    if (overlayActive && overlayQuad) {
+      renderer.setRenderTarget(null)
+      renderer.render(overlayScene, overlayCamera)
+    }
     return
   }
 
