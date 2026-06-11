@@ -159,7 +159,7 @@ export async function loadBuildings() {
     const PROJECT_EXTRA_IDS = {
       'NL32B_N326E397_Y2442.3019_X3430.7208': 'EUBUCCO',
       'NL32B_N326E397_Y2450.6257_X3407.2096': 'DBSM',
-      'NL32B_N326E397_Y2458.2224_X3375.6242': 'AI Climate Institute',
+      'NL32B_N326E397_Y2430.4532_X3460.0532': 'AI Climate Institute',
       'NL32B_N326E397_Y2428.6069_X3491.8848': "CCAI's Data Gaps",
       'NL32B_N326E397_Y2453.8555_X3347.7617': 'Academic Research',
     }
@@ -194,9 +194,9 @@ export async function loadBuildings() {
     })
 
     const area = polygonArea(exterior)
-    const height = area > areaThreshold
+    const height = (area > areaThreshold
       ? 20 + Math.random() * 5
-      : 10 + Math.random() * 5
+      : 10 + Math.random() * 5) + (feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638' ? 5 : 0) + (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111' ? 3 : 0)
 
     const extrudeSettings = { depth: height, bevelEnabled: false }
     const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings)

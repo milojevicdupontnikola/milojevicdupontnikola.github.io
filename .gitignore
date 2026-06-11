@@ -5,3 +5,5 @@ source/public/footprints_centered.geojson
 *.pyc
 __pycache__
 .gitkeep
+notebooks/
+imgs_raw/

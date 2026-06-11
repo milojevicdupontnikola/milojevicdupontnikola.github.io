@@ -582,6 +582,32 @@ infoCloseBtn.addEventListener('mouseleave', () => { infoCloseBtn.style.textShado
 infoCloseBtn.addEventListener('click', closeInfoPanel)
 infoInner.appendChild(infoCloseBtn)
 
+const infoImgPanel = document.createElement('div')
+infoImgPanel.style.cssText = [
+  'position: fixed',
+  'bottom: 8%',
+  'z-index: 31',
+  'opacity: 0',
+  'transition: opacity 0.4s',
+  'pointer-events: none',
+  '-webkit-mask-image: linear-gradient(to right, transparent 0px, black 10px calc(100% - 10px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 10px calc(100% - 10px), transparent 100%)',
+  '-webkit-mask-composite: intersect',
+  'mask-image: linear-gradient(to right, transparent 0px, black 10px calc(100% - 10px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 10px calc(100% - 10px), transparent 100%)',
+  'mask-composite: intersect',
+].join(';') + ';'
+const infoImg = document.createElement('img')
+infoImg.style.cssText = 'display:block'
+infoImgPanel.appendChild(infoImg)
+document.body.appendChild(infoImgPanel)
+
+const extraImages = {
+  'AI Climate Institute': { src: '/imgs/RAF_1922.webp', width: 400, side: 'right', bottom: '8%' },
+  "CCAI's Data Gaps": { src: '/imgs/data_gaps.webp', width: 672, side: 'right', bottom: '8%' },
+  'Academic Research': { src: '/imgs/thesis.webp', width: 400, side: 'right', bottom: '8%' },
+  'EUBUCCO': { src: '/imgs/EUBUCCO.webp', width: 600, side: 'right', bottom: '12%' },
+  'DBSM': { src: '/imgs/DBSM.webp', width: 600, side: 'left', bottom: '12%' },
+}
+
 function openInfoPanel(extra) {
   if (projectAnimDir !== 0) return
   if (infoActive) {
@@ -627,6 +653,19 @@ function openInfoPanel(extra) {
       infoBody.style.opacity = '1'
       infoCloseBtn.style.transition = 'opacity 0.6s'
       infoCloseBtn.style.opacity = '1'
+      setTimeout(() => {
+        const img = extraImages[extra.label]
+        if (img) {
+          infoImg.src = img.src
+          infoImg.style.width = img.width + 'px'
+          infoImgPanel.style.right = img.side === 'left' ? 'auto' : '3%'
+          infoImgPanel.style.left = img.side === 'left' ? '3%' : 'auto'
+          infoImgPanel.style.bottom = img.bottom || '8%'
+          infoImgPanel.style.opacity = '1'
+        } else {
+          infoImgPanel.style.opacity = '0'
+        }
+      }, 600)
     }
   }, 60)
 
@@ -637,6 +676,7 @@ function closeInfoPanel() {
   if (!infoActive) return
   infoActive = false
   infoTarget = null
+  infoImgPanel.style.opacity = '0'
   infoPanel.style.opacity = '0'
 }
 
@@ -663,6 +703,11 @@ function updateInfoPanelPosition() {
   let left = anchor + GAP
   if (left + pw > window.innerWidth - GAP) {
     left = Math.min(sx, px) - BUFFER - pw - GAP
+  }
+  const imgCfg = extraImages[infoTarget.label]
+  if (imgCfg) {
+    const shift = imgCfg.width + 40
+    left += imgCfg.side === 'left' ? shift : -shift
   }
   infoPanel.style.left = Math.max(GAP, Math.min(left, window.innerWidth - pw - GAP)) + 'px'
 
