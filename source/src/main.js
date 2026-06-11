@@ -249,8 +249,8 @@ function startWaveTransition() {
   overlayQuad.material.uniforms.uProgress.value = 0
   gsap.to(overlayQuad.material.uniforms.uProgress, {
     value: 1,
-    duration: 2.5,
-    ease: 'power2.inOut',
+    duration: 1.8,
+    ease: 'power4.in',
     onComplete: () => {
       overlayDone = true
     },
