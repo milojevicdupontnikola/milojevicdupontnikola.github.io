@@ -30,10 +30,12 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
   labelRenderer.setSize(window.innerWidth, window.innerHeight)
-  if (targetA) targetA.setSize(window.innerWidth, window.innerHeight)
-  if (targetB) targetB.setSize(window.innerWidth, window.innerHeight)
+  const s = new THREE.Vector2()
+  renderer.getDrawingBufferSize(s)
+  if (targetA) targetA.setSize(s.x, s.y)
+  if (targetB) targetB.setSize(s.x, s.y)
   if (overlayQuad) {
-    overlayQuad.material.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight)
+    overlayQuad.material.uniforms.uResolution.value.set(s.x, s.y)
   }
 })
 
@@ -915,8 +917,10 @@ let animDone = false
 let targetA, targetB, overlayScene, overlayCamera, overlayQuad, overlayActive = false, overlayDone = false
 
 // overlay setup
-targetA = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight)
-targetB = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight)
+const dSize = new THREE.Vector2()
+renderer.getDrawingBufferSize(dSize)
+targetA = new THREE.WebGLRenderTarget(dSize.x, dSize.y)
+targetB = new THREE.WebGLRenderTarget(dSize.x, dSize.y)
 overlayScene = new THREE.Scene()
 overlayCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
 const overlayMat = new THREE.ShaderMaterial({
@@ -924,9 +928,9 @@ const overlayMat = new THREE.ShaderMaterial({
     uTexture1: { value: null },
     uTexture2: { value: null },
     uProgress: { value: 0 },
-    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-    uTexture1Size: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-    uTexture2Size: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uResolution: { value: new THREE.Vector2(dSize.x, dSize.y) },
+    uTexture1Size: { value: new THREE.Vector2(dSize.x, dSize.y) },
+    uTexture2Size: { value: new THREE.Vector2(dSize.x, dSize.y) },
   },
   vertexShader,
   fragmentShader,
@@ -1156,12 +1160,11 @@ function animate() {
   updateInfoPanelPosition()
 
   if (st < 9) {
-    renderer.render(scene, camera)
-    labelRenderer.render(scene, camera)
-    // during wave overlay, render overlay instead
     if (overlayActive && overlayQuad) {
-      renderer.setRenderTarget(null)
       renderer.render(overlayScene, overlayCamera)
+    } else {
+      renderer.render(scene, camera)
+      labelRenderer.render(scene, camera)
     }
     return
   }

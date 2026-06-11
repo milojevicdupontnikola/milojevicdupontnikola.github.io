@@ -15,6 +15,14 @@ export const fragmentShader = `
   uniform vec2 uTexture2Size;
   varying vec2 vUv;
 
+  vec3 linearToSRGB(vec3 linear) {
+    return mix(
+      pow(linear, vec3(0.41666)) * 1.055 - vec3(0.055),
+      linear * 12.92,
+      vec3(lessThanEqual(linear, vec3(0.0031308)))
+    );
+  }
+
   vec2 getCoverUV(vec2 uv, vec2 textureSize) {
     vec2 s = uResolution / textureSize;
     float scale = max(s.x, s.y);
@@ -79,6 +87,6 @@ export const fragmentShader = `
     float finalMask = max(mask, 1.0 - distortion.inside);
     vec4 color = mix(newImg, currentImg, finalMask);
 
-    gl_FragColor = color;
+    gl_FragColor = vec4(linearToSRGB(color.rgb), color.a);
   }
 `
