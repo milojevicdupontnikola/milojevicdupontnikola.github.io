@@ -163,7 +163,10 @@ export async function loadBuildings() {
     const normalColor = color.clone()
     adjustSaturation(normalColor, 0.75)
     if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
-      normalColor.setHex(0x555555)
+      normalColor.setHex(0x664488)
+    }
+    if (feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638') {
+      normalColor.setHex(0x884455)
     }
     if (feature.properties.id === 'NL32B_N326E397_Y2695.8445_X3504.8284') {
       normalColor.setHex(0x447777)
@@ -177,7 +180,10 @@ export async function loadBuildings() {
       highlightColor = color.clone()
       adjustSaturation(highlightColor, 1.8)
       if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
-        highlightColor.setHex(0x555555)
+        highlightColor.setHex(0xaa66cc)
+      }
+      if (feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638') {
+        highlightColor.setHex(0xee6677)
       }
       if (feature.properties.id === 'NL32B_N326E397_Y2428.6069_X3491.8848') {
         highlightColor.setHex(0x9b9380)
@@ -220,14 +226,10 @@ export async function loadBuildings() {
         glowColor = 0x6688ff
       } else if (feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638') {
         label = 'Contact'
-        glowColor = highlightColor.clone()
-        adjustSaturation(glowColor, 3.0)
-        const hsl = {}
-        glowColor.getHSL(hsl)
-        glowColor.setHSL(hsl.h, hsl.s, Math.min(1, hsl.l * 1.3))
+        glowColor = 0xee6677
       } else if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
         label = 'TOPICS'
-        glowColor = 0x555555
+        glowColor = 0xaa66cc
       } else if (feature.properties.id === 'NL32B_N326E397_Y2695.8445_X3504.8284') {
         label = 'SKILLS'
         glowColor = 0x44cccc
@@ -239,7 +241,7 @@ export async function loadBuildings() {
       for (const g of glows) {
         g.mesh.visible = false
       }
-      const opacityMul = label === 'TOPICS' ? 2.0 : 1.5
+      const opacityMul = 1.5
       for (const g of glows) {
         g.baseOpacity *= opacityMul
         g.material.opacity = g.baseOpacity
