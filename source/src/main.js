@@ -271,6 +271,7 @@ let slidePanel = null
 let slidePanelSign = 1 // +1 for right-side panels, -1 for left-side panels
 let aboutTypingDone = false
 let contactTypingDone = false
+let skillsActive = false
 
 function easeInOutQuad(t) {
   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
@@ -419,7 +420,7 @@ function runContactTypewriter() {
 }
 
 function openAbout() {
-  if (aboutActive || contactActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  if (aboutActive || contactActive || skillsActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   aboutActive = true
   slideDir = 1
   slideTargetX = -SLIDE_X
@@ -567,7 +568,7 @@ contactCloseBtn.addEventListener('click', closeContact)
 contactInner.appendChild(contactCloseBtn)
 
 function openContact() {
-  if (contactActive || aboutActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  if (contactActive || aboutActive || skillsActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   contactActive = true
   slideDir = 1
   slideTargetX = 120
@@ -595,6 +596,98 @@ function closeContact() {
   for (const l of labels) {
     l.el.style.opacity = '0.95'
   }
+}
+
+// --- Skills section ---
+
+const skillsPanel = document.createElement('div')
+skillsPanel.style.cssText = [
+  'position: fixed',
+  'top: 50%',
+  'left: 50%',
+  'transform: translate(-50%, -50%)',
+  'width: 50%',
+  'max-width: 700px',
+  'z-index: 25',
+  'font-family: monospace',
+  'color: #fff',
+  'pointer-events: none',
+  'opacity: 0',
+  'transition: none',
+].join(';') + ';'
+document.body.appendChild(skillsPanel)
+
+const skillsGrid = document.createElement('div')
+skillsGrid.style.cssText = [
+  'display: grid',
+  'grid-template-columns: 1fr 1fr',
+  'gap: 12px',
+].join(';') + ';'
+
+const skillNames = [
+  'Applied Machine\nLearning',
+  'Geospatial Data\nEngineering',
+  'Desk Research /\nWriting',
+  'Education',
+  'Project\nManagement',
+  'Design',
+]
+for (const name of skillNames) {
+  const box = document.createElement('div')
+  box.textContent = name
+  box.style.cssText = [
+    'background: #000',
+    'border: 1px solid #fff',
+    'border-radius: 8px',
+    'padding: 24px 16px',
+    'font-size: 14px',
+    'line-height: 1.4',
+    'text-align: center',
+    'white-space: pre-wrap',
+    'pointer-events: auto',
+  ].join(';') + ';'
+  skillsGrid.appendChild(box)
+}
+skillsPanel.appendChild(skillsGrid)
+
+const skillsCloseBtn = document.createElement('span')
+skillsCloseBtn.textContent = '[ close ]'
+skillsCloseBtn.style.cssText = [
+  'display: inline-block',
+  'margin-top: 20px',
+  'font-size: 14px',
+  'font-weight: 700',
+  'letter-spacing: 2px',
+  'cursor: pointer',
+  'pointer-events: auto',
+  'opacity: 1',
+  'transition: opacity 0.3s',
+  'text-align: center',
+  'width: 100%',
+].join(';') + ';'
+skillsCloseBtn.addEventListener('mouseenter', () => { skillsCloseBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
+skillsCloseBtn.addEventListener('mouseleave', () => { skillsCloseBtn.style.textShadow = 'none' })
+skillsCloseBtn.addEventListener('click', closeSkills)
+skillsPanel.appendChild(skillsCloseBtn)
+
+function openSkills() {
+  if (skillsActive || aboutActive || contactActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  skillsActive = true
+  slideDir = 1
+  slideTargetX = -SLIDE_X
+  slidePanel = skillsPanel
+  slidePanelSign = 1
+  slideStartTime = clock.getElapsedTime()
+  for (const l of labels) l.el.style.opacity = '0'
+  skillsPanel.style.opacity = '1'
+}
+
+function closeSkills() {
+  if (!skillsActive || slideDir !== 0) return
+  skillsActive = false
+  slideDir = -1
+  slideStartTime = clock.getElapsedTime()
+  for (const l of labels) l.el.style.opacity = '0.95'
 }
 
 // --- Info panels (EUBUCCO / DBSM) ---
@@ -829,7 +922,7 @@ function updateInfoPanelPosition() {
 }
 
 function openProjectMode() {
-  if (projectActive || projectAnimDir !== 0 || aboutActive || contactActive || slideDir !== 0) return
+  if (projectActive || projectAnimDir !== 0 || aboutActive || contactActive || skillsActive || slideDir !== 0) return
   projectActive = true
   projectAnimDir = 1
   projectAnimStart = clock.getElapsedTime()
@@ -1041,7 +1134,7 @@ renderer.domElement.addEventListener('pointermove', e => {
 })
 
 renderer.domElement.addEventListener('click', () => {
-  if (!animDone || projectAnimDir !== 0 || aboutActive || contactActive) return
+  if (!animDone || projectAnimDir !== 0 || aboutActive || contactActive || skillsActive) return
   for (const target of hovered) {
     if (target.label === 'About') {
       openAbout()
@@ -1049,6 +1142,8 @@ renderer.domElement.addEventListener('click', () => {
       if (!projectActive) openProjectMode()
     } else if (target.label === 'Contact') {
       openContact()
+    } else if (target.label === 'SKILLS') {
+      openSkills()
     } else {
       console.log('Clicked:', target.label)
     }
@@ -1209,15 +1304,19 @@ function animate() {
     const srcX = slideDir === 1 ? 0 : slideTargetX
     const dstX = slideDir === 1 ? slideTargetX : 0
     container.position.x = srcX + (dstX - srcX) * et
-    const targetScale = slidePanel === aboutPanel ? 0.8 : 1.0
+    const targetScale = slidePanel === aboutPanel ? 0.8 : slidePanel === skillsPanel ? 0.7 : 1.0
     const srcS = slideDir === 1 ? 1 : targetScale
     const dstS = slideDir === 1 ? targetScale : 1
     container.scale.setScalar(srcS + (dstS - srcS) * et)
-    const panelSrc = slideDir === 1 ? slidePanelSign * 100 : 0
-    const panelDst = slideDir === 1 ? 0 : slidePanelSign * 100
-    const tx = panelSrc + (panelDst - panelSrc) * et
-    slidePanel.style.transform = 'translateX(' + tx + '%)'
-    slidePanel.style.opacity = String(t)
+    if (slidePanel === skillsPanel) {
+      slidePanel.style.opacity = String(t)
+    } else {
+      const panelSrc = slideDir === 1 ? slidePanelSign * 100 : 0
+      const panelDst = slideDir === 1 ? 0 : slidePanelSign * 100
+      const tx = panelSrc + (panelDst - panelSrc) * et
+      slidePanel.style.transform = 'translateX(' + tx + '%)'
+      slidePanel.style.opacity = String(t)
+    }
     if (t >= 1) slideDir = 0
   }
 
