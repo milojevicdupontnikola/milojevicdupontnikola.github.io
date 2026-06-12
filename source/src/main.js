@@ -94,7 +94,7 @@ const TITLE_LINE2 = 'Geospatial Data + AI  \u2192  Climate + Cities'
 const ARROW_HTML = '<span style="font-family:\'Noto Sans Math\',serif;display:inline-block;transform:translateY(-0.08em)">\u2192</span>'
 
 const TITLE_CLASS = 'position: fixed; left: 50%; transform: translateX(-50%); z-index: 20; text-align: center; font-family: monospace; color: #fff; opacity: 0; pointer-events: none;'
-const LINE_CLASS = 'font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; white-space: nowrap; overflow: hidden; min-height: 1.4em;'
+const LINE_CLASS = 'font-size: clamp(18px, 2.2vw, 26px); font-weight: 700; letter-spacing: 2px; white-space: nowrap; overflow: hidden; min-height: 1.4em;'
 
 const titleLine1 = document.createElement('div')
 titleLine1.style.cssText = TITLE_CLASS + ' top: 3%; ' + LINE_CLASS
@@ -117,7 +117,7 @@ subtitleEl.style.cssText = [
   'z-index: 20',
   'font-family: monospace',
   'color: #fff',
-  'font-size: 1rem',
+  'font-size: clamp(12px, 1.4vw, 18px)',
   'font-weight: 700',
   'letter-spacing: 1px',
   'opacity: 0',
@@ -307,7 +307,7 @@ aboutPanel.appendChild(aboutInner)
 
 const aboutHeading = document.createElement('h1')
 aboutHeading.style.cssText = [
-  'font-size: 1.25rem',
+  'font-size: clamp(15px, 1.8vw, 22px)',
   'font-weight: 700',
   'letter-spacing: 3px',
   'text-transform: uppercase',
@@ -320,7 +320,7 @@ aboutInner.appendChild(aboutHeading)
 
 const aboutBody = document.createElement('div')
 aboutBody.style.cssText = [
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'line-height: 1.7',
   'letter-spacing: 0.5px',
   'opacity: 0',
@@ -352,7 +352,7 @@ closeBtn.textContent = '[ close ]'
 closeBtn.style.cssText = [
   'display: inline-block',
   'margin-top: 6px',
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'font-weight: 700',
   'letter-spacing: 2px',
   'cursor: pointer',
@@ -456,7 +456,7 @@ constructionBanner.style.cssText = [
   'left: 24px',
   'z-index: 20',
   'font-family: monospace',
-  'font-size: 1rem',
+  'font-size: clamp(12px, 1.4vw, 18px)',
   'font-weight: 700',
   'color: #000',
   'background: #fff',
@@ -503,7 +503,7 @@ contactPanel.appendChild(contactInner)
 
 const contactHeading = document.createElement('h1')
 contactHeading.style.cssText = [
-  'font-size: 1.25rem',
+  'font-size: clamp(15px, 1.8vw, 22px)',
   'font-weight: 700',
   'letter-spacing: 3px',
   'text-transform: uppercase',
@@ -516,7 +516,7 @@ contactInner.appendChild(contactHeading)
 
 const contactBody = document.createElement('div')
 contactBody.style.cssText = [
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'line-height: 1.7',
   'letter-spacing: 0.5px',
   'opacity: 0',
@@ -554,7 +554,7 @@ contactCloseBtn.textContent = '[ close ]'
 contactCloseBtn.style.cssText = [
   'display: inline-block',
   'margin-top: 24px',
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'font-weight: 700',
   'letter-spacing: 2px',
   'cursor: pointer',
@@ -632,7 +632,7 @@ skillsPanel.appendChild(skillsInner)
 const skillsHeading = document.createElement('h1')
 skillsHeading.textContent = 'SKILLS'
 skillsHeading.style.cssText = [
-  'font-size: 1.25rem',
+  'font-size: clamp(15px, 1.8vw, 22px)',
   'font-weight: 700',
   'letter-spacing: 3px',
   'text-transform: uppercase',
@@ -667,7 +667,7 @@ for (const name of skillNames) {
     'border: 1px solid #fff',
     'border-radius: 8px',
     'padding: 18px 16px',
-    'font-size: 1rem',
+    'font-size: clamp(12px, 1.4vw, 18px)',
     'line-height: 1.4',
     'text-align: center',
     'white-space: pre-wrap',
@@ -696,7 +696,7 @@ skillsCloseBtn.style.cssText = [
   'display: inline-block',
   'margin-top: 6px',
   'margin-bottom: 24px',
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'font-weight: 700',
   'letter-spacing: 2px',
   'cursor: pointer',
@@ -783,7 +783,7 @@ infoPanel.appendChild(infoInner)
 
 const infoHeading = document.createElement('h1')
 infoHeading.style.cssText = [
-  'font-size: 1.25rem',
+  'font-size: clamp(15px, 1.8vw, 22px)',
   'font-weight: 700',
   'letter-spacing: 3px',
   'text-transform: uppercase',
@@ -796,7 +796,7 @@ infoInner.appendChild(infoHeading)
 
 const infoBody = document.createElement('div')
 infoBody.style.cssText = [
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'line-height: 1.7',
   'letter-spacing: 0.5px',
   'opacity: 0',
@@ -808,7 +808,7 @@ infoCloseBtn.textContent = '[ close ]'
 infoCloseBtn.style.cssText = [
   'display: inline-block',
   'margin-top: 12px',
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'font-weight: 700',
   'letter-spacing: 2px',
   'cursor: pointer',
@@ -1060,7 +1060,7 @@ projCloseBtn.style.cssText = [
   'z-index: 30',
   'font-family: monospace',
   'color: #fff',
-  'font-size: 0.875rem',
+  'font-size: clamp(10px, 1.1vw, 14px)',
   'font-weight: 700',
   'letter-spacing: 2px',
   'cursor: pointer',
@@ -1082,7 +1082,7 @@ projHeading.style.cssText = [
   'z-index: 30',
   'font-family: monospace',
   'color: #fff',
-  'font-size: 1.25rem',
+  'font-size: clamp(15px, 1.8vw, 22px)',
   'font-weight: 700',
   'letter-spacing: 3px',
   'text-transform: uppercase',
