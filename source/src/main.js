@@ -3,6 +3,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { loadBuildings } from './loadBuildings.js'
 import { gsap } from 'gsap'
 import { vertexShader, fragmentShader } from './waveShader.js'
+import { pixelReveal } from './pixelReveal.js'
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x000000)
@@ -393,7 +394,6 @@ function runAboutTypewriter() {
 function runContactTypewriter() {
   contactBody.style.opacity = '0'
   contactCloseBtn.style.opacity = '0'
-  contactImg.style.opacity = '0'
   contactTypingDone = false
   contactHeading.innerHTML = ''
   const txt = document.createTextNode('')
@@ -411,8 +411,7 @@ function runContactTypewriter() {
       contactTypingDone = true
       contactBody.style.transition = 'opacity 0.6s'
       contactBody.style.opacity = '1'
-      contactImg.style.transition = 'opacity 0.6s'
-      contactImg.style.opacity = '1'
+      setTimeout(() => pixelReveal(contactImgWrapper), 1000)
       contactCloseBtn.style.transition = 'opacity 0.6s'
       contactCloseBtn.style.opacity = '1'
     }
@@ -524,21 +523,30 @@ contactBody.style.cssText = [
 contactBody.textContent = 'milojevic-dupont (at) pm.me'
 contactInner.appendChild(contactBody)
 
-const contactImg = document.createElement('img')
-contactImg.src = 'imgs/profile.webp'
-contactImg.style.cssText = [
+const contactImgWrapper = document.createElement('div')
+contactImgWrapper.style.cssText = [
   'display: block',
   'width: 62.5%',
   'margin-top: 28px',
-  'opacity: 0',
-  'transition: opacity 0.6s',
+  'position: relative',
+  'overflow: hidden',
   '-webkit-mask-image: linear-gradient(to right, transparent 0px, black 20px calc(100% - 20px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 20px calc(100% - 20px), transparent 100%)',
   '-webkit-mask-composite: intersect',
   'mask-image: linear-gradient(to right, transparent 0px, black 20px calc(100% - 20px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 20px calc(100% - 20px), transparent 100%)',
   'mask-composite: intersect',
 ].join(';') + ';'
+
+const contactImg = document.createElement('img')
+contactImg.src = 'imgs/profile.webp'
+contactImg.style.cssText = [
+  'display: block',
+  'width: 100%',
+  'opacity: 1',
+  'clip-path: inset(0 0 100% 0)',
+].join(';') + ';'
 contactImg.alt = 'Profile photo'
-contactInner.appendChild(contactImg)
+contactImgWrapper.appendChild(contactImg)
+contactInner.appendChild(contactImgWrapper)
 
 const contactCloseBtn = document.createElement('span')
 contactCloseBtn.textContent = '[ close ]'
@@ -572,7 +580,9 @@ function openContact() {
   contactPanel.style.opacity = '1'
   contactHeading.innerHTML = ''
   contactBody.style.opacity = '0'
-  contactImg.style.opacity = '0'
+  contactImg.style.clipPath = 'inset(0 0 100% 0)'
+  const oldGrid = contactImgWrapper.querySelector('.pixel-reveal-grid')
+  if (oldGrid) oldGrid.remove()
   contactCloseBtn.style.opacity = '0'
   setTimeout(() => runContactTypewriter(), 900)
 }
@@ -687,7 +697,8 @@ infoImgPanel.style.cssText = [
   'mask-composite: intersect',
 ].join(';') + ';'
 const infoImg = document.createElement('img')
-infoImg.style.cssText = 'display:block'
+infoImg.style.cssText = 'display:block;clip-path:inset(0 0 100% 0)'
+infoImg.alt = ''
 infoImgPanel.appendChild(infoImg)
 document.body.appendChild(infoImgPanel)
 
@@ -745,14 +756,22 @@ function openInfoPanel(extra) {
       infoCloseBtn.style.transition = 'opacity 0.6s'
       infoCloseBtn.style.opacity = '1'
       setTimeout(() => {
-        const img = extraImages[extra.label]
-        if (img) {
-          infoImg.src = img.src
-          infoImg.style.width = img.width + 'px'
-          infoImgPanel.style.right = img.side === 'left' ? 'auto' : '3%'
-          infoImgPanel.style.left = img.side === 'left' ? '3%' : 'auto'
-          infoImgPanel.style.bottom = img.bottom || '8%'
+        const imgCfg = extraImages[extra.label]
+        if (imgCfg) {
+          infoImg.style.clipPath = 'inset(0 0 100% 0)'
+          const oldGrid = infoImgPanel.querySelector('.pixel-reveal-grid')
+          if (oldGrid) oldGrid.remove()
+          const doReveal = () => {
+            pixelReveal(infoImgPanel)
+          }
+          infoImg.addEventListener('load', doReveal, { once: true })
+          infoImg.src = imgCfg.src
+          infoImg.style.width = imgCfg.width + 'px'
+          infoImgPanel.style.right = imgCfg.side === 'left' ? 'auto' : '3%'
+          infoImgPanel.style.left = imgCfg.side === 'left' ? '3%' : 'auto'
+          infoImgPanel.style.bottom = imgCfg.bottom || '8%'
           infoImgPanel.style.opacity = '1'
+          if (infoImg.complete) doReveal()
         } else {
           infoImgPanel.style.opacity = '0'
         }
@@ -769,6 +788,8 @@ function closeInfoPanel() {
   infoTarget = null
   infoImgPanel.style.opacity = '0'
   infoPanel.style.opacity = '0'
+  const oldGrid = infoImgPanel.querySelector('.pixel-reveal-grid')
+  if (oldGrid) oldGrid.remove()
 }
 
 function updateInfoPanelPosition() {
