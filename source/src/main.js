@@ -603,25 +603,39 @@ function closeContact() {
 const skillsPanel = document.createElement('div')
 skillsPanel.style.cssText = [
   'position: fixed',
-  'top: 50%',
-  'left: 50%',
-  'transform: translate(-50%, -50%)',
-  'width: 50%',
-  'max-width: 700px',
+  'right: 0',
+  'top: 10%',
+  'width: 44%',
+  'height: 80%',
   'z-index: 25',
   'font-family: monospace',
   'color: #fff',
   'pointer-events: none',
   'opacity: 0',
+  'transform: translateX(100%)',
   'transition: none',
 ].join(';') + ';'
 document.body.appendChild(skillsPanel)
+
+const skillsInner = document.createElement('div')
+skillsInner.style.cssText = [
+  'padding: 4% 8% 0 8%',
+  'height: 100%',
+  'overflow-y: auto',
+  'pointer-events: auto',
+  'box-sizing: border-box',
+  'display: flex',
+  'flex-direction: column',
+].join(';') + ';'
+skillsPanel.appendChild(skillsInner)
 
 const skillsGrid = document.createElement('div')
 skillsGrid.style.cssText = [
   'display: grid',
   'grid-template-columns: 1fr 1fr',
   'gap: 12px',
+  'flex: 1',
+  'align-content: center',
 ].join(';') + ';'
 
 const skillNames = [
@@ -648,27 +662,26 @@ for (const name of skillNames) {
   ].join(';') + ';'
   skillsGrid.appendChild(box)
 }
-skillsPanel.appendChild(skillsGrid)
+skillsInner.appendChild(skillsGrid)
 
 const skillsCloseBtn = document.createElement('span')
 skillsCloseBtn.textContent = '[ close ]'
 skillsCloseBtn.style.cssText = [
   'display: inline-block',
-  'margin-top: 20px',
+  'margin-top: 6px',
+  'margin-bottom: 24px',
   'font-size: 14px',
   'font-weight: 700',
   'letter-spacing: 2px',
   'cursor: pointer',
   'pointer-events: auto',
-  'opacity: 1',
+  'opacity: 0',
   'transition: opacity 0.3s',
-  'text-align: center',
-  'width: 100%',
 ].join(';') + ';'
 skillsCloseBtn.addEventListener('mouseenter', () => { skillsCloseBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
 skillsCloseBtn.addEventListener('mouseleave', () => { skillsCloseBtn.style.textShadow = 'none' })
 skillsCloseBtn.addEventListener('click', closeSkills)
-skillsPanel.appendChild(skillsCloseBtn)
+skillsInner.appendChild(skillsCloseBtn)
 
 function openSkills() {
   if (skillsActive || aboutActive || contactActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
@@ -680,6 +693,11 @@ function openSkills() {
   slideStartTime = clock.getElapsedTime()
   for (const l of labels) l.el.style.opacity = '0'
   skillsPanel.style.opacity = '1'
+  skillsCloseBtn.style.opacity = '0'
+  setTimeout(() => {
+    skillsCloseBtn.style.transition = 'opacity 0.6s'
+    skillsCloseBtn.style.opacity = '1'
+  }, 1300)
 }
 
 function closeSkills() {
@@ -1308,15 +1326,11 @@ function animate() {
     const srcS = slideDir === 1 ? 1 : targetScale
     const dstS = slideDir === 1 ? targetScale : 1
     container.scale.setScalar(srcS + (dstS - srcS) * et)
-    if (slidePanel === skillsPanel) {
-      slidePanel.style.opacity = String(t)
-    } else {
-      const panelSrc = slideDir === 1 ? slidePanelSign * 100 : 0
-      const panelDst = slideDir === 1 ? 0 : slidePanelSign * 100
-      const tx = panelSrc + (panelDst - panelSrc) * et
-      slidePanel.style.transform = 'translateX(' + tx + '%)'
-      slidePanel.style.opacity = String(t)
-    }
+    const panelSrc = slideDir === 1 ? slidePanelSign * 100 : 0
+    const panelDst = slideDir === 1 ? 0 : slidePanelSign * 100
+    const tx = panelSrc + (panelDst - panelSrc) * et
+    slidePanel.style.transform = 'translateX(' + tx + '%)'
+    slidePanel.style.opacity = String(slideDir === 1 ? t : 1 - t)
     if (t >= 1) slideDir = 0
   }
 
