@@ -412,7 +412,7 @@ function runContactTypewriter() {
       contactTypingDone = true
       contactBody.style.transition = 'opacity 0.6s'
       contactBody.style.opacity = '1'
-      setTimeout(() => pixelReveal(contactImgWrapper), 1000)
+      setTimeout(() => pixelReveal(contactImgWrapper), 500)
       contactCloseBtn.style.transition = 'opacity 0.6s'
       contactCloseBtn.style.opacity = '1'
     }
