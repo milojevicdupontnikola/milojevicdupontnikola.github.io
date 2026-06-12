@@ -504,13 +504,14 @@ const contactImg = document.createElement('img')
 contactImg.src = 'imgs/profile.webp'
 contactImg.style.cssText = [
   'display: block',
-  'width: 140px',
-  'height: 140px',
-  'border-radius: 50%',
-  'object-fit: cover',
+  'width: 62.5%',
   'margin-top: 28px',
   'opacity: 0',
   'transition: opacity 0.6s',
+  '-webkit-mask-image: linear-gradient(to right, transparent 0px, black 20px calc(100% - 20px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 20px calc(100% - 20px), transparent 100%)',
+  '-webkit-mask-composite: intersect',
+  'mask-image: linear-gradient(to right, transparent 0px, black 20px calc(100% - 20px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 20px calc(100% - 20px), transparent 100%)',
+  'mask-composite: intersect',
 ].join(';') + ';'
 contactImg.alt = 'Profile photo'
 contactInner.appendChild(contactImg)
