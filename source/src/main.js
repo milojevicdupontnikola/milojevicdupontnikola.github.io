@@ -666,13 +666,26 @@ for (const name of skillNames) {
     'background: #000',
     'border: 1px solid #fff',
     'border-radius: 8px',
-    'padding: 24px 16px',
-    'font-size: 14px',
+    'padding: 18px 16px',
+    'font-size: 16px',
     'line-height: 1.4',
     'text-align: center',
     'white-space: pre-wrap',
     'pointer-events: auto',
+    'cursor: pointer',
+    'display: flex',
+    'align-items: center',
+    'justify-content: center',
+    'transition: border-color 0.2s, background 0.2s',
   ].join(';') + ';'
+  box.addEventListener('mouseenter', () => {
+    box.style.borderColor = '#88ccff'
+    box.style.background = '#111'
+  })
+  box.addEventListener('mouseleave', () => {
+    box.style.borderColor = '#fff'
+    box.style.background = '#000'
+  })
   skillsGrid.appendChild(box)
 }
 skillsInner.appendChild(skillsGrid)
