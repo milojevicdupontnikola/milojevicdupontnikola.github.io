@@ -629,6 +629,19 @@ skillsInner.style.cssText = [
 ].join(';') + ';'
 skillsPanel.appendChild(skillsInner)
 
+const skillsHeading = document.createElement('h1')
+skillsHeading.textContent = 'SKILLS'
+skillsHeading.style.cssText = [
+  'font-size: 20px',
+  'font-weight: 700',
+  'letter-spacing: 3px',
+  'text-transform: uppercase',
+  'text-align: center',
+  'margin: 0 0 28px 0',
+  'min-height: 1.4em',
+].join(';') + ';'
+skillsInner.appendChild(skillsHeading)
+
 const skillsGrid = document.createElement('div')
 skillsGrid.style.cssText = [
   'display: grid',
@@ -677,6 +690,7 @@ skillsCloseBtn.style.cssText = [
   'pointer-events: auto',
   'opacity: 0',
   'transition: opacity 0.3s',
+  'align-self: center',
 ].join(';') + ';'
 skillsCloseBtn.addEventListener('mouseenter', () => { skillsCloseBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
 skillsCloseBtn.addEventListener('mouseleave', () => { skillsCloseBtn.style.textShadow = 'none' })
@@ -1322,7 +1336,7 @@ function animate() {
     const srcX = slideDir === 1 ? 0 : slideTargetX
     const dstX = slideDir === 1 ? slideTargetX : 0
     container.position.x = srcX + (dstX - srcX) * et
-    const targetScale = slidePanel === aboutPanel ? 0.8 : slidePanel === skillsPanel ? 0.7 : 1.0
+    const targetScale = slidePanel === aboutPanel ? 0.8 : slidePanel === skillsPanel ? 0.8 : 1.0
     const srcS = slideDir === 1 ? 1 : targetScale
     const dstS = slideDir === 1 ? targetScale : 1
     container.scale.setScalar(srcS + (dstS - srcS) * et)
