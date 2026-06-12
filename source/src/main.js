@@ -393,6 +393,7 @@ function runAboutTypewriter() {
 function runContactTypewriter() {
   contactBody.style.opacity = '0'
   contactCloseBtn.style.opacity = '0'
+  contactImg.style.opacity = '0'
   contactTypingDone = false
   contactHeading.innerHTML = ''
   const txt = document.createTextNode('')
@@ -410,6 +411,8 @@ function runContactTypewriter() {
       contactTypingDone = true
       contactBody.style.transition = 'opacity 0.6s'
       contactBody.style.opacity = '1'
+      contactImg.style.transition = 'opacity 0.6s'
+      contactImg.style.opacity = '1'
       contactCloseBtn.style.transition = 'opacity 0.6s'
       contactCloseBtn.style.opacity = '1'
     }
@@ -497,6 +500,21 @@ contactBody.style.cssText = [
 contactBody.textContent = 'milojevic-dupont (at) pm.me'
 contactInner.appendChild(contactBody)
 
+const contactImg = document.createElement('img')
+contactImg.src = 'imgs/profile.webp'
+contactImg.style.cssText = [
+  'display: block',
+  'width: 140px',
+  'height: 140px',
+  'border-radius: 50%',
+  'object-fit: cover',
+  'margin-top: 28px',
+  'opacity: 0',
+  'transition: opacity 0.6s',
+].join(';') + ';'
+contactImg.alt = 'Profile photo'
+contactInner.appendChild(contactImg)
+
 const contactCloseBtn = document.createElement('span')
 contactCloseBtn.textContent = '[ close ]'
 contactCloseBtn.style.cssText = [
@@ -529,6 +547,7 @@ function openContact() {
   contactPanel.style.opacity = '1'
   contactHeading.innerHTML = ''
   contactBody.style.opacity = '0'
+  contactImg.style.opacity = '0'
   contactCloseBtn.style.opacity = '0'
   setTimeout(() => runContactTypewriter(), 900)
 }
