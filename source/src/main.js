@@ -1209,6 +1209,10 @@ function animate() {
     const srcX = slideDir === 1 ? 0 : slideTargetX
     const dstX = slideDir === 1 ? slideTargetX : 0
     container.position.x = srcX + (dstX - srcX) * et
+    const targetScale = slidePanel === aboutPanel ? 0.8 : 1.0
+    const srcS = slideDir === 1 ? 1 : targetScale
+    const dstS = slideDir === 1 ? targetScale : 1
+    container.scale.setScalar(srcS + (dstS - srcS) * et)
     const panelSrc = slideDir === 1 ? slidePanelSign * 100 : 0
     const panelDst = slideDir === 1 ? 0 : slidePanelSign * 100
     const tx = panelSrc + (panelDst - panelSrc) * et
