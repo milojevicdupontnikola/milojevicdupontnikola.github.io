@@ -239,17 +239,10 @@ export async function loadBuildings() {
       for (const g of glows) {
         g.mesh.visible = false
       }
-      if (label === 'Contact') {
-        for (const g of glows) {
-          g.baseOpacity *= 1.5
-          g.material.opacity = g.baseOpacity
-        }
-      }
-      if (label === 'TOPICS') {
-        for (const g of glows) {
-          g.baseOpacity *= 1.4
-          g.material.opacity = g.baseOpacity
-        }
+      const opacityMul = label === 'TOPICS' ? 2.0 : 1.5
+      for (const g of glows) {
+        g.baseOpacity *= opacityMul
+        g.material.opacity = g.baseOpacity
       }
       const centroid = polygonCentroid(exterior)
       glowTargets.push({ glows, mesh, material: fillMat, normalColor, highlightColor, line, height, centroid, label, extrudeDelay })
