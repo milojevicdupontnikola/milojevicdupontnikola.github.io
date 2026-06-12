@@ -62,29 +62,21 @@ function inflateGeometry(geom, offset) {
 }
 
 function addGlow(group, geom, pos, color, scaleFactor = 1, inflationOffsets = null) {
-  const defaultScales = [
-    1 + (1.008 - 1) * scaleFactor,
-    1 + (1.02 - 1) * scaleFactor,
-    1 + (1.04 - 1) * scaleFactor,
+  const defaultOffsets = [
+    0.5 * scaleFactor,
+    1.0 * scaleFactor,
+    2.0 * scaleFactor,
   ]
-  const layers = inflationOffsets
-    ? [
-        { offset: inflationOffsets[0], opacity: 0.2 },
-        { offset: inflationOffsets[1], opacity: 0.06 },
-        { offset: inflationOffsets[2], opacity: 0.02 },
-      ]
-    : [
-        { scale: defaultScales[0], opacity: 0.2 },
-        { scale: defaultScales[1], opacity: 0.06 },
-        { scale: defaultScales[2], opacity: 0.02 },
-      ]
+  const offsets = inflationOffsets || defaultOffsets
+  const layers = [
+    { offset: offsets[0], opacity: 0.2 },
+    { offset: offsets[1], opacity: 0.06 },
+    { offset: offsets[2], opacity: 0.02 },
+  ]
 
   const glows = []
   for (const layer of layers) {
-    const g = inflationOffsets
-      ? inflateGeometry(geom, layer.offset)
-      : geom.clone()
-    if (!inflationOffsets) g.scale(layer.scale, layer.scale, layer.scale)
+    const g = inflateGeometry(geom, layer.offset)
     const m = new THREE.MeshBasicMaterial({
       color,
       transparent: true,
@@ -154,7 +146,8 @@ export async function loadBuildings() {
       feature.properties.id === 'NL32B_N326E397_Y2596.6553_X3343.2809' ||
       feature.properties.id === 'NL32B_N326E397_Y2400.9044_X3394.3630' ||
       feature.properties.id === 'NL32B_N326E397_Y2696.0651_X3149.1638' ||
-      feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111'
+      feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111' ||
+      feature.properties.id === 'NL32B_N326E397_Y2695.8445_X3504.8284'
 
     const PROJECT_EXTRA_IDS = {
       'NL32B_N326E397_Y2442.3019_X3430.7208': 'EUBUCCO',
@@ -171,6 +164,9 @@ export async function loadBuildings() {
     adjustSaturation(normalColor, 0.75)
     if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
       normalColor.setHex(0x555555)
+    }
+    if (feature.properties.id === 'NL32B_N326E397_Y2695.8445_X3504.8284') {
+      normalColor.setHex(0x447777)
     }
     if (feature.properties.id === 'NL32B_N326E397_Y2428.6069_X3491.8848') {
       normalColor.setHex(0x949089)
@@ -230,8 +226,11 @@ export async function loadBuildings() {
         glowColor.getHSL(hsl)
         glowColor.setHSL(hsl.h, hsl.s, Math.min(1, hsl.l * 1.3))
       } else if (feature.properties.id === 'NL32B_N326E397_Y2375.0403_X3192.4111') {
-        label = 'THEMES'
+        label = 'TOPICS'
         glowColor = 0x555555
+      } else if (feature.properties.id === 'NL32B_N326E397_Y2695.8445_X3504.8284') {
+        label = 'SKILLS'
+        glowColor = 0x44cccc
       } else {
         label = 'About'
         glowColor = 0xff8800
@@ -246,7 +245,7 @@ export async function loadBuildings() {
           g.material.opacity = g.baseOpacity
         }
       }
-      if (label === 'THEMES') {
+      if (label === 'TOPICS') {
         for (const g of glows) {
           g.baseOpacity *= 1.4
           g.material.opacity = g.baseOpacity
