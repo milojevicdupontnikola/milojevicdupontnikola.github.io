@@ -447,6 +447,30 @@ function closeAbout() {
   }
 }
 
+// --- Construction banner ---
+
+const constructionBanner = document.createElement('div')
+constructionBanner.style.cssText = [
+  'position: fixed',
+  'bottom: 24px',
+  'left: 24px',
+  'z-index: 20',
+  'font-family: monospace',
+  'font-size: 16px',
+  'font-weight: 700',
+  'color: #000',
+  'background: #fff',
+  'padding: 10px 18px',
+  'line-height: 1',
+  'pointer-events: none',
+  '-webkit-mask-image: linear-gradient(to right, transparent 0px, black 8px calc(100% - 8px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 8px calc(100% - 8px), transparent 100%)',
+  '-webkit-mask-composite: intersect',
+  'mask-image: linear-gradient(to right, transparent 0px, black 8px calc(100% - 8px), transparent 100%), linear-gradient(to bottom, transparent 0px, black 8px calc(100% - 8px), transparent 100%)',
+  'mask-composite: intersect',
+].join(';') + ';'
+constructionBanner.textContent = '\u{1F6A7} website under construction'
+document.body.appendChild(constructionBanner)
+
 // --- Contact section ---
 
 const contactPanel = document.createElement('div')
