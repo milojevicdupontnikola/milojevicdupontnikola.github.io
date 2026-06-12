@@ -646,7 +646,7 @@ const skillsGrid = document.createElement('div')
 skillsGrid.style.cssText = [
   'display: grid',
   'grid-template-columns: 1fr 1fr',
-  'gap: 12px',
+  'gap: 16px',
   'flex: 1',
   'align-content: center',
 ].join(';') + ';'
