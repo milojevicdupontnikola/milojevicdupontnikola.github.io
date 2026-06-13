@@ -1427,7 +1427,7 @@ function animate() {
         const p = elapsed <= start ? 0 : Math.min(1, (elapsed - start) / PHASE.dur[PHASES.EXTRUDE])
         for (const g of target.glows) g.mesh.scale.z = p
       }
-      if (elapsed - stStart >= 2.5) {
+      if (elapsed - stStart >= 3.2) {
         st = 6
         stStart = elapsed
         startSubtitle(2)
