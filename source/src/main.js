@@ -420,7 +420,7 @@ function runContactTypewriter() {
 }
 
 function openAbout() {
-  if (aboutActive || contactActive || skillsActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  if (aboutActive || contactActive || skillsActive || topicsActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   aboutActive = true
   slideDir = 1
   slideTargetX = -SLIDE_X
@@ -568,7 +568,7 @@ contactCloseBtn.addEventListener('click', closeContact)
 contactInner.appendChild(contactCloseBtn)
 
 function openContact() {
-  if (contactActive || aboutActive || skillsActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  if (contactActive || aboutActive || skillsActive || topicsActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   contactActive = true
   slideDir = 1
   slideTargetX = 120
@@ -711,7 +711,7 @@ skillsCloseBtn.addEventListener('click', closeSkills)
 skillsInner.appendChild(skillsCloseBtn)
 
 function openSkills() {
-  if (skillsActive || aboutActive || contactActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  if (skillsActive || topicsActive || aboutActive || contactActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
   skillsActive = true
   slideDir = 1
   slideTargetX = -SLIDE_X
@@ -730,6 +730,145 @@ function openSkills() {
 function closeSkills() {
   if (!skillsActive || slideDir !== 0) return
   skillsActive = false
+  slideDir = -1
+  slideStartTime = clock.getElapsedTime()
+  for (const l of labels) l.el.style.opacity = '0.95'
+}
+
+// --- Topics section ---
+
+let topicsActive = false
+
+const topicsPanel = document.createElement('div')
+topicsPanel.style.cssText = [
+  'position: fixed',
+  'left: 0',
+  'top: 10%',
+  'width: 44%',
+  'height: 80%',
+  'z-index: 25',
+  'font-family: monospace',
+  'color: #fff',
+  'pointer-events: none',
+  'opacity: 0',
+  'transform: translateX(-100%)',
+  'transition: none',
+].join(';') + ';'
+document.body.appendChild(topicsPanel)
+
+const topicsInner = document.createElement('div')
+topicsInner.style.cssText = [
+  'padding: 4% 8% 0 8%',
+  'height: 100%',
+  'overflow-y: auto',
+  'pointer-events: auto',
+  'box-sizing: border-box',
+  'display: flex',
+  'flex-direction: column',
+].join(';') + ';'
+topicsPanel.appendChild(topicsInner)
+
+const topicsHeading = document.createElement('h1')
+topicsHeading.textContent = 'TOPICS'
+topicsHeading.style.cssText = [
+  'font-size: clamp(15px, 1.8vw, 20px)',
+  'font-weight: 700',
+  'letter-spacing: 3px',
+  'text-transform: uppercase',
+  'text-align: center',
+  'margin: 0 0 28px 0',
+  'min-height: 1.4em',
+].join(';') + ';'
+topicsInner.appendChild(topicsHeading)
+
+const topicsGrid = document.createElement('div')
+topicsGrid.style.cssText = [
+  'display: grid',
+  'grid-template-columns: 1fr 1fr',
+  'gap: 16px',
+  'flex: 1',
+  'align-content: center',
+].join(';') + ';'
+
+const topicNames = [
+  'Spatial\nInvestigations',
+  'AI for Climate',
+  'Geospatial AI\nDevelopment',
+  'Livable &\nSustainable Cities',
+  'Science\nCommunication',
+  'Open Data\nStrategies',
+]
+for (const name of topicNames) {
+  const box = document.createElement('div')
+  box.textContent = name
+  box.style.cssText = [
+    'background: #000',
+    'border: 1px solid #fff',
+    'border-radius: 8px',
+    'padding: 18px 16px',
+    'font-size: clamp(12px, 1.4vw, 16px)',
+    'line-height: 1.4',
+    'text-align: center',
+    'white-space: pre-wrap',
+    'pointer-events: auto',
+    'cursor: pointer',
+    'display: flex',
+    'align-items: center',
+    'justify-content: center',
+    'transition: border-color 0.2s, background 0.2s',
+  ].join(';') + ';'
+  box.addEventListener('mouseenter', () => {
+    box.style.borderColor = '#88ccff'
+    box.style.background = '#111'
+  })
+  box.addEventListener('mouseleave', () => {
+    box.style.borderColor = '#fff'
+    box.style.background = '#000'
+  })
+  topicsGrid.appendChild(box)
+}
+topicsInner.appendChild(topicsGrid)
+
+const topicsCloseBtn = document.createElement('span')
+topicsCloseBtn.textContent = '[ close ]'
+topicsCloseBtn.style.cssText = [
+  'display: inline-block',
+  'margin-top: 6px',
+  'margin-bottom: 24px',
+  'font-size: clamp(10px, 1.1vw, 13px)',
+  'font-weight: 700',
+  'letter-spacing: 2px',
+  'cursor: pointer',
+  'pointer-events: auto',
+  'opacity: 0',
+  'transition: opacity 0.3s',
+  'align-self: center',
+].join(';') + ';'
+topicsCloseBtn.addEventListener('mouseenter', () => { topicsCloseBtn.style.textShadow = '0 0 12px rgba(255,255,255,0.5)' })
+topicsCloseBtn.addEventListener('mouseleave', () => { topicsCloseBtn.style.textShadow = 'none' })
+topicsCloseBtn.addEventListener('click', closeTopics)
+topicsInner.appendChild(topicsCloseBtn)
+
+function openTopics() {
+  if (topicsActive || skillsActive || aboutActive || contactActive || slideDir !== 0 || projectActive || projectAnimDir !== 0) return
+  topicsActive = true
+  slideDir = 1
+  slideTargetX = SLIDE_X
+  slidePanel = topicsPanel
+  slidePanelSign = -1
+  slideStartTime = clock.getElapsedTime()
+  for (const l of labels) l.el.style.opacity = '0'
+  topicsPanel.style.opacity = '1'
+  topicsCloseBtn.style.opacity = '0'
+  setTimeout(() => {
+    topicsCloseBtn.style.transition = 'opacity 0.6s'
+    topicsCloseBtn.style.opacity = '1'
+  }, 1300)
+}
+
+function closeTopics() {
+  if (!topicsActive || slideDir !== 0) return
+  topicsActive = false
   slideDir = -1
   slideStartTime = clock.getElapsedTime()
   for (const l of labels) l.el.style.opacity = '0.95'
@@ -967,7 +1106,7 @@ function updateInfoPanelPosition() {
 }
 
 function openProjectMode() {
-  if (projectActive || projectAnimDir !== 0 || aboutActive || contactActive || skillsActive || slideDir !== 0) return
+  if (projectActive || projectAnimDir !== 0 || aboutActive || contactActive || skillsActive || topicsActive || slideDir !== 0) return
   projectActive = true
   projectAnimDir = 1
   projectAnimStart = clock.getElapsedTime()
@@ -1179,7 +1318,7 @@ renderer.domElement.addEventListener('pointermove', e => {
 })
 
 renderer.domElement.addEventListener('click', () => {
-  if (!animDone || projectAnimDir !== 0 || aboutActive || contactActive || skillsActive) return
+  if (!animDone || projectAnimDir !== 0 || aboutActive || contactActive || skillsActive || topicsActive) return
   for (const target of hovered) {
     if (target.label === 'About') {
       openAbout()
@@ -1189,6 +1328,8 @@ renderer.domElement.addEventListener('click', () => {
       openContact()
     } else if (target.label === 'SKILLS') {
       openSkills()
+    } else if (target.label === 'TOPICS') {
+      openTopics()
     } else {
       console.log('Clicked:', target.label)
     }
@@ -1349,7 +1490,7 @@ function animate() {
     const srcX = slideDir === 1 ? 0 : slideTargetX
     const dstX = slideDir === 1 ? slideTargetX : 0
     container.position.x = srcX + (dstX - srcX) * et
-    const targetScale = slidePanel === aboutPanel ? 0.8 : slidePanel === skillsPanel ? 0.8 : 1.0
+    const targetScale = slidePanel === aboutPanel || slidePanel === skillsPanel || slidePanel === topicsPanel ? 0.8 : 1.0
     const srcS = slideDir === 1 ? 1 : targetScale
     const dstS = slideDir === 1 ? targetScale : 1
     container.scale.setScalar(srcS + (dstS - srcS) * et)
