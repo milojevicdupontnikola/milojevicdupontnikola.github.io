@@ -792,7 +792,7 @@ topicsGrid.style.cssText = [
 
 const topicNames = [
   'Spatial\nInvestigations',
-  'AI for Climate',
+  'AI and Climate\n(applications/impacts)',
   'Geospatial AI\nDevelopment',
   'Livable &\nSustainable Cities',
   'Science\nCommunication',
