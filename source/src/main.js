@@ -182,10 +182,10 @@ function runTitleWriter() {
           titleLine2Div.innerHTML = html.replace(cursorHtml, '')
           titleComplete = true
         }
-      }, 50)
+      }, 25)
       titleTimers.push(t2)
     }
-  }, 60)
+  }, 30)
   titleTimers.push(t1)
 }
 
@@ -217,7 +217,7 @@ function startSubtitle(idx) {
       subtitleEl.removeChild(cur)
       subTypingDone = true
     }
-  }, 60)
+  }, 30)
 }
 
 function startWaveTransition() {
@@ -389,7 +389,7 @@ function runAboutTypewriter() {
       closeBtn.style.transition = 'opacity 0.6s'
       closeBtn.style.opacity = '1'
     }
-  }, 60)
+  }, 30)
 }
 
 function runContactTypewriter() {
@@ -416,7 +416,7 @@ function runContactTypewriter() {
       contactCloseBtn.style.transition = 'opacity 0.6s'
       contactCloseBtn.style.opacity = '1'
     }
-  }, 60)
+  }, 30)
 }
 
 function openAbout() {
@@ -1054,7 +1054,7 @@ function openInfoPanel(extra) {
         }
       }, 600)
     }
-  }, 60)
+  }, 30)
 
   infoPanel.style.opacity = '1'
 }
@@ -1172,7 +1172,7 @@ function runProjectTypewriter() {
       clearInterval(t)
       projHeading.removeChild(cur)
     }
-  }, 60)
+  }, 30)
 }
 
 // --- Project mode ---

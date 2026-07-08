@@ -59,7 +59,7 @@ After 2.5s, the animation switches to an event-driven state machine (states 0–
 
 | # | Phase | Trigger | What happens |
 |---|-------|---------|-------------|
-| 0 | SUB1_TYPING | 2.5s elapsed | First subtitle types at 60ms/char with terminal cursor |
+| 0 | SUB1_TYPING | 2.5s elapsed | First subtitle types at 30ms/char with terminal cursor |
 | 1 | SUB1_HOLD | typing done | 2s hold |
 | 2 | SUB2_TYPING | hold done | Second subtitle types (before wave, not during extrusion). |
 | 3 | SUB2_HOLD | typing done | 2s hold |
@@ -67,8 +67,10 @@ After 2.5s, the animation switches to an event-driven state machine (states 0–
 | 5 | EXTRUDE | wave done | Buildings extrude 0→1 over 1.5s (staggered 0–0.8s). No subtitle. |
 | 6 | GLOW+SUB3 | 2s after extrude starts | Target buildings: instant highlight color + sine-wave pulsing. Third subtitle types. |
 | 7 | SUB3_HOLD | typing done | 2s hold |
-| 8 | TITLE | hold done | Title typewriter: line 1 at 60ms/char, line 2 at 50ms/char |
+| 8 | TITLE | hold done | Title typewriter: line 1 at 30ms/char, line 2 at 25ms/char |
 | 9 | DONE | 1s after title done | Labels visible (opacity 0.95), hover/click/bounce enabled |
+
+Full intro animation takes **~22s** from page load until clickable (2.5s initial + ~19s state machine + 1s final delay).
 
 Extrusion runs only during state 5, never repeats. Glow activation is instant (no 1s lerp) with immediate sine-wave pulsing.
 
@@ -82,7 +84,7 @@ Extrusion runs only during state 5, never repeats. Glow activation is instant (n
 
 ## Subtitles
 
-Three-line subtitle sequence types at the top-right (right-aligned, 16px, 60ms/char):
+Three-line subtitle sequence types at the top-right (right-aligned, 16px, 30ms/char):
 1. `Where sensing our environment produced digital representations...`
 2. `...using AI critically to enhance sense-making capabilities...`
 3. `...to target action on socio-environmental challenges.`
@@ -91,7 +93,7 @@ Each holds for 2s after completing before the next phase.
 
 ## Title Overlay
 
-Fixed, centered monospace (24px, bold 700, letter-spacing 2px). Types at 60ms/char (line 1) then 50ms/char (line 2):
+Fixed, centered monospace (24px, bold 700, letter-spacing 2px). Types at 30ms/char (line 1) then 25ms/char (line 2):
 
 - **Top 3%**: `Nikola Milojevic-Dupont – Scientific Consulting`
 - **Bottom 3%**: `Geospatial Data + AI  →  Climate + Cities` (→ renders in Noto Sans Math)
@@ -132,7 +134,7 @@ Target buildings (About + Projects) are hidden until the title typewriter comple
 **Behavior**:
 - Container slides left (x: 0 → -200) over 1.2s easeInOutQuad. Title/labels fade out.
 - About panel (fixed, right 44%, full height, z-index 25) slides in from right
-- 900ms delay, then "About" heading typewrites at 60ms/char with terminal cursor
+- 900ms delay, then "About" heading typewrites at 30ms/char with terminal cursor
 - Body text fades in 0.6s after heading finishes. `[ close ]` reverses everything.
 
 **Body content**: 9 paragraphs (14px monospace, line-height 1.7, letter-spacing 0.5px). Bullet points (indices 3–5) bold.
@@ -147,7 +149,7 @@ Target buildings (About + Projects) are hidden until the title typewriter comple
 - Camera zooms to frame the combined bounding box of Projects + EUBUCCO + DBSM buildings
 - Camera moves to anticlockwise offset `(-200, 320, 450)` normalized, distance = `boxWidth × 1.4 / 2tan(hFov/2)`
 - Elevation ~35°, camera animation over 1s easeInOutQuad
-- "Projects" heading typewrites at 60ms/char with terminal cursor (centered, `bottom: 18%`)
+- "Projects" heading typewrites at 30ms/char with terminal cursor (centered, `bottom: 18%`)
 - `[ close ]` at `bottom: 10%` — reverses camera, resets labels
 
 **EUBUCCO/DBSM panels**: clicking either opens a black info panel (43% × 66%, z-index 30, feather-edged mask). Screen-space position: adjacent to building, flips to left if near right edge, vertically screen-centered. Typewriter heading + fade-in body + `[ close ]`. No overlap with PROJECTS title (clamped to `74vh`). Extra labels hidden outside project mode, shown at `opacity: 1` during.
