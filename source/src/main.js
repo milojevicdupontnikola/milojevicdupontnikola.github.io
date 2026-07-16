@@ -521,7 +521,7 @@ contactBody.style.cssText = [
   'letter-spacing: 0.5px',
   'opacity: 0',
 ].join(';') + ';'
-contactBody.textContent = 'milojevic-dupont (at) pm.me'
+contactBody.textContent = 'milojevicdupont (at) pm.me'
 contactInner.appendChild(contactBody)
 
 const contactImgWrapper = document.createElement('div')
